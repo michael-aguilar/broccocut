@@ -906,5 +906,10 @@
   "Zoom in more to view waveform": "Zoom in more to view waveform",
   "Zoom in timeline": "Zoom in timeline",
   "Zoom in/out timeline": "Zoom in/out timeline",
-  "Zoom out timeline": "Zoom out timeline"
+  "Zoom out timeline": "Zoom out timeline",
+  "Live audio mix": "Live audio mix",
+  "Left → both ears": "Left → both ears",
+  "Playback tracks": "Playback tracks",
+  "Track {{track}}: left to both ears": "Track {{track}}: left to both ears",
+  "Preview only: copy this track's left channel to both ears": "Preview only: copy this track's left channel to both ears"
 }

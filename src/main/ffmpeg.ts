@@ -591,10 +591,11 @@ export async function getDuration(filePath: string) {
 const enableLog = false;
 const encode = true;
 
-export function createMediaSourceProcess({ path, videoStreamIndex, audioStreams, seekTo, size, fps, rotate, forceColorspace, ffmpegHwaccel }: {
+export function createMediaSourceProcess({ path, videoStreamIndex, audioStreams, leftToBothAudioStreamIndex, seekTo, size, fps, rotate, forceColorspace, ffmpegHwaccel }: {
   path: string,
   videoStreamIndex?: number | undefined,
   audioStreams: AudioStreamInfo[],
+  leftToBothAudioStreamIndex?: number | undefined,
   seekTo: number,
   size?: number | undefined,
   fps?: number | undefined,
@@ -667,7 +668,11 @@ export function createMediaSourceProcess({ path, videoStreamIndex, audioStreams,
     if (audioStreams.length > 0) {
       // some streams have a channel layout that ffmpeg cannot resample or downmix, so relabel it first
       const getAudioFilters = (stream: AudioStreamInfo, rest: string[]) => {
-        const filters = [getFixChannelLayoutFilter(stream), ...rest].filter((filter) => filter != null);
+        const filters = [
+          getFixChannelLayoutFilter(stream),
+          stream.index === leftToBothAudioStreamIndex ? 'pan=stereo|c0=c0|c1=c0' : undefined,
+          ...rest,
+        ].filter((filter) => filter != null);
         return filters.length > 0 ? filters.join(',') : 'anull';
       };
 
@@ -743,7 +748,10 @@ export function createMediaSourceProcess({ path, videoStreamIndex, audioStreams,
       '-c', 'copy',
     ]),
 
-    '-f', 'mp4', '-movflags', '+frag_keyframe+empty_moov+default_base_moof', '-',
+    '-f', 'mp4', '-movflags', '+frag_keyframe+empty_moov+default_base_moof',
+    // Audio-only preview has no video keyframes to trigger fragment delivery.
+    ...(videoStreamIndex == null ? ['-frag_duration', '100000'] : []),
+    '-',
   ];
 
   logger.info(getFfCommandLine('ffmpeg', args));

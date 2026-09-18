@@ -155,7 +155,8 @@ const defaults: Config = {
   captureFrameQuality: 0.95,
   captureFrameFileNameFormat: 'timestamp',
   enableNativeHevc: true,
-  enableUpdateCheck: true,
+  // Custom builds should not prompt users to replace their workflow features with upstream binaries.
+  enableUpdateCheck: false,
   cleanupChoices: {
     trashTmpFiles: true, askForCleanup: true, closeFile: true, cleanupAfterExport: false,
   },

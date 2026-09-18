@@ -11,6 +11,8 @@ import type { FFprobeStream } from '../../../common/ffprobe';
 
 
 function PlaybackStreamSelector({
+  leftToBothAudioStreamIndex,
+  onLeftToBothChange,
   subtitleStreams,
   videoStreams,
   audioStreams,
@@ -21,6 +23,8 @@ function PlaybackStreamSelector({
   onActiveVideoStreamChange,
   onActiveAudioStreamsChange,
 }: {
+  leftToBothAudioStreamIndex: number | undefined,
+  onLeftToBothChange: (index: number | undefined) => void,
   subtitleStreams: FFprobeStream[],
   videoStreams: FFprobeStream[],
   audioStreams: FFprobeStream[],
@@ -109,6 +113,16 @@ function PlaybackStreamSelector({
 
               {audioStreams.map((audioStream, i) => (
                 <div key={audioStream.index}>
+                  <label htmlFor={`preview-mic-${audioStream.index}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '.3em', marginRight: '.6em', fontSize: '.85em' }} title={t("Preview only: copy this track's left channel to both ears")}>
+                    <input
+                      id={`preview-mic-${audioStream.index}`}
+                      type="checkbox"
+                      aria-label={t('Track {{track}}: left to both ears', { track: i + 1 })}
+                      checked={leftToBothAudioStreamIndex === audioStream.index}
+                      onChange={(event) => { resetTimer(); onLeftToBothChange(event.target.checked ? audioStream.index : undefined); }}
+                    />
+                    {t('Left → both ears')}
+                  </label>
                   <Switch
                     style={{ verticalAlign: 'middle', marginRight: '.4em' }}
                     checked={activeAudioStreamIndexes.has(audioStream.index)}
@@ -129,6 +143,7 @@ function PlaybackStreamSelector({
         size={30}
         role="button"
         style={{ margin: '0 7px', color: 'var(--gray-12)', opacity: 0.7 }}
+        aria-label={t('Playback tracks')}
         onClick={onIconClick}
       />
     </>

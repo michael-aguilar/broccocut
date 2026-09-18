@@ -158,6 +158,7 @@ function App() {
   const [zoomWindowStartTime, setZoomWindowStartTime] = useState(0);
   const [activeVideoStreamIndex, setActiveVideoStreamIndex] = useState<number>();
   const [activeAudioStreamIndexes, setActiveAudioStreamIndexes] = useState<Set<number>>(new Set());
+  const [leftToBothAudioStreamIndex, setLeftToBothAudioStreamIndex] = useState<number>();
   const [activeSubtitleStreamIndex, setActiveSubtitleStreamIndex] = useState<number>();
   const [hideCompatPlayer, setHideCompatPlayer] = useState(false);
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
@@ -608,11 +609,18 @@ function App() {
     )
     // or if selected multiple audio streams (html5 video element doesn't support that)
     || activeAudioStreamIndexes.size > 1
+    || (leftToBothAudioStreamIndex != null && activeAudioStreamIndexes.has(leftToBothAudioStreamIndex))
   );
   // if user selected a rotation, but they might want to turn off the rotation preview
   // but allow the user to disable
   const compatPlayerWanted = (isRotationSet && !hideCompatPlayer)
     || usingDummyVideo;
+
+  // Keep supported original video on its native seeking path while mixing only audio.
+  // Rotation, proxy files, and unsupported video still use the compatibility preview.
+  const nativeVideoPreview = Boolean(activeVideoStream != null && !usingDummyVideo && !previewFilePath && !isRotationSet
+    && videoRef.current != null && videoRef.current.readyState >= 1 && !videoRef.current.error
+    && canHtml5PlayerPlayStreams(videoRef.current, activeVideoStream.index, undefined));
 
   const compatPlayerEnabled = (compatPlayerRequired || compatPlayerWanted) && (activeVideoStream != null || activeAudioStreams.length > 0);
 
@@ -689,6 +697,7 @@ function App() {
     setZoomWindowStartTime(0);
     setSubtitlesByStreamId({});
     setActiveAudioStreamIndexes(new Set());
+    setLeftToBothAudioStreamIndex(undefined);
     setActiveVideoStreamIndex(undefined);
     setActiveSubtitleStreamIndex(undefined);
     setHideCompatPlayer(false);
@@ -1530,6 +1539,11 @@ function App() {
       if (timecode) setStartTimeOffset(timecode);
       setDetectedFps(getFps());
       setMainFileMeta({ ffprobeMeta, stats: { size: fileStats.size, atime: fileStats.atimeMs, mtime: fileStats.mtimeMs, ctime: fileStats.ctimeMs, birthtime: fileStats.birthtimeMs } });
+      // ShadowPlay workflow: listen to all tracks, with the last stereo mic centered.
+      const previewAudioStreams = getAudioStreams(ffprobeMeta.streams);
+      setActiveAudioStreamIndexes(new Set(previewAudioStreams.map((stream) => stream.index)));
+      const lastAudioStream = previewAudioStreams.at(-1);
+      setLeftToBothAudioStreamIndex(previewAudioStreams.length > 1 && lastAudioStream?.channels === 2 ? lastAudioStream.index : undefined);
       setCopyStreamIdsForPath(fp, () => copyStreamIdsForPathNew);
       setDetectedFileFormat(fileFormatNew);
       if (outFormatLocked) {
@@ -2588,7 +2602,7 @@ function App() {
                         {renderSubtitles()}
                       </video>
 
-                      {filePath != null && compatPlayerEnabled && <MediaSourcePlayer rotate={effectiveRotation} filePath={filePath} videoStream={activeVideoStream} audioStreams={activeAudioStreams} masterVideoRef={videoRef} mediaSourceQuality={mediaSourceQuality} ffmpegHwaccel={ffmpegHwaccel} />}
+                      {filePath != null && compatPlayerEnabled && <MediaSourcePlayer rotate={effectiveRotation} filePath={filePath} videoStream={activeVideoStream} audioStreams={activeAudioStreams} masterVideoRef={videoRef} mediaSourceQuality={mediaSourceQuality} ffmpegHwaccel={ffmpegHwaccel} leftToBothAudioStreamIndex={leftToBothAudioStreamIndex} nativeVideoPreview={nativeVideoPreview} />}
                     </div>
 
                     {bigWaveformEnabled && <BigWaveform waveforms={waveforms} relevantTime={relevantTime} playing={playing} fileDurationNonZero={fileDurationNonZero} zoom={zoomUnrounded} seekRel={seekRel} darkMode={darkMode} />}
@@ -2601,12 +2615,10 @@ function App() {
                             {t('Rotation preview')}
                           </>
                         ) : (
-                          <>
-                            {t('FFmpeg-assisted playback')}
-                          </>
+                          nativeVideoPreview ? t('Live audio mix') : t('FFmpeg-assisted playback')
                         )}
 
-                        <div style={{ cursor: 'pointer', pointerEvents: 'initial', color: 'var(--gray-12)', opacity: 0.7, padding: '.2em', marginLeft: '.5em' }} role="button" onClick={() => incrementMediaSourceQuality()} title={t('Select playback quality')}>{mediaSourceQualities[mediaSourceQuality]}</div>
+                        {!nativeVideoPreview && <div style={{ cursor: 'pointer', pointerEvents: 'initial', color: 'var(--gray-12)', opacity: 0.7, padding: '.2em', marginLeft: '.5em' }} role="button" onClick={() => incrementMediaSourceQuality()} title={t('Select playback quality')}>{mediaSourceQualities[mediaSourceQuality]}</div>}
 
                         {!compatPlayerRequired && <FaRegTimesCircle role="button" style={{ cursor: 'pointer', pointerEvents: 'initial', verticalAlign: 'middle', padding: '.2em' }} onClick={handleHideCompatPlayerClick} />}
                       </div>
@@ -2617,7 +2629,7 @@ function App() {
                         <VolumeControl playbackVolume={playbackVolume} setPlaybackVolume={setPlaybackVolume} onToggleMutedClick={toggleMuted} />
 
                         {shouldShowPlaybackStreamSelector && (
-                          <PlaybackStreamSelector subtitleStreams={subtitleStreams} videoStreams={videoStreams} audioStreams={audioStreams} activeSubtitleStreamIndex={activeSubtitleStreamIndex} activeVideoStreamIndex={activeVideoStreamIndex} activeAudioStreamIndexes={activeAudioStreamIndexes} onActiveSubtitleChange={onActiveSubtitleChange} onActiveVideoStreamChange={onActiveVideoStreamChange} onActiveAudioStreamsChange={onActiveAudioStreamsChange} />
+                          <PlaybackStreamSelector subtitleStreams={subtitleStreams} videoStreams={videoStreams} audioStreams={audioStreams} activeSubtitleStreamIndex={activeSubtitleStreamIndex} activeVideoStreamIndex={activeVideoStreamIndex} activeAudioStreamIndexes={activeAudioStreamIndexes} onActiveSubtitleChange={onActiveSubtitleChange} onActiveVideoStreamChange={onActiveVideoStreamChange} onActiveAudioStreamsChange={onActiveAudioStreamsChange} leftToBothAudioStreamIndex={leftToBothAudioStreamIndex} onLeftToBothChange={setLeftToBothAudioStreamIndex} />
                         )}
 
                         {!showRightBar && (

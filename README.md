@@ -1,3 +1,5 @@
+**Broccocut:** this personal fork adds all-track audio defaults, microphone channel routing, and fast native-video scrubbing. See [customizations, development, and upstream updates](docs/broccocut.md).
+
 <div align="center">
 	<br>
   <p><a href="https://losslesscut.app/"><img src="src/renderer/src/icon.svg" width="120" alt="LosslessCut" /></a></p>
