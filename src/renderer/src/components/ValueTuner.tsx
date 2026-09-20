@@ -6,7 +6,7 @@ import styles from './ValueTuner.module.css';
 
 import Switch from './Switch';
 import Button from './Button';
-import { primaryColor } from '../colors';
+import { primaryColor, primaryInkColor } from '../colors';
 
 
 function ValueTuner({ title, value, setValue, onFinished, resolution, decimals, min: minIn = 0, max: maxIn = 1, resetToDefault }: {
@@ -66,7 +66,7 @@ function ValueTuner({ title, value, setValue, onFinished, resolution, decimals, 
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '.3em' }}>
         <Button onClick={handleResetToDefaultClick}>{t('Default')}</Button>
-        <Button onClick={onFinished} style={{ backgroundColor: primaryColor, color: 'white' }}>{t('Done')}</Button>
+        <Button onClick={onFinished} style={{ backgroundColor: primaryColor, color: primaryInkColor }}>{t('Done')}</Button>
       </div>
     </div>
   );

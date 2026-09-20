@@ -1,8 +1,9 @@
 export const saveColor = 'var(--green-11)';
 export const dangerColor = 'var(--red-11)';
 export const warningColor = 'var(--orange-9)';
-export const primaryColor = 'var(--cyan-9)';
+export const primaryColor = 'var(--accent-surface)';
+export const primaryInkColor = 'var(--accent-ink)';
 export const primaryTextColor = 'var(--cyan-11)';
-export const controlsBackground = 'var(--gray-4)';
+export const controlsBackground = 'var(--surface)';
 export const timelineBackground = 'var(--gray-2)';
-export const darkModeTransition = 'background .5s';
+export const darkModeTransition = 'background 150ms ease';

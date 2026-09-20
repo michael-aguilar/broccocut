@@ -1,14 +1,21 @@
 .exportButton {
   all: unset;
   cursor: pointer;
-  color: white;
-  border-radius: .3em;
+  color: var(--accent-ink);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  border-radius: var(--radius-control);
   padding-bottom: .1em;
   padding-left: .4em;
   padding-right: .4em;
   white-space: nowrap;
 }
 
-.exportButton:focus {
-  outline: .1em solid white;
+.exportButton:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.exportButton:hover {
+  filter: brightness(.94);
 }

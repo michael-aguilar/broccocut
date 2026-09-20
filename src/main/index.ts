@@ -14,6 +14,7 @@ import assert from 'node:assert';
 import timers from 'node:timers/promises';
 import { z } from 'zod';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
 import electronUnhandled from 'electron-unhandled';
 import { fileTypeFromFile } from 'file-type';
 import type { Asyncify } from 'type-fest';
@@ -52,6 +53,10 @@ remote.initialize();
 
 
 app.name = appName;
+
+const appIconPath = app.isPackaged
+  ? join(process.resourcesPath, isMac ? 'app-icon-mac.png' : 'app-icon.png')
+  : join(app.getAppPath(), isMac ? 'icon-build/app-mac-512.png' : 'icon-build/app-512.png');
 
 if (isWindows) {
   // in order to set the title on OS notifications on Windows, this needs to be set to app.name
@@ -162,7 +167,8 @@ function createWindow() {
       webSecurity: !isDev,
       preload: fileURLToPath(new URL('../preload/index.cjs', import.meta.url)),
     },
-    backgroundColor: darkMode ? '#333' : '#fff',
+    backgroundColor: darkMode ? '#0f1411' : '#f1f0e9',
+    icon: appIconPath,
     minWidth: 300,
     minHeight: 300,
   });
@@ -372,6 +378,7 @@ async function init() {
 
     logger.info('Waiting for app to become ready');
     await readyPromise;
+    if (isMac && await pathExists(appIconPath)) app.dock?.setIcon(appIconPath);
 
     logger.info('CLI arguments', argv);
     // Only if no files to open already (open-file might have already added some files)

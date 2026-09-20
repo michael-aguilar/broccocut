@@ -9,7 +9,7 @@ import { GiSoundWaves } from 'react-icons/gi';
 // import useTraceUpdate from 'use-trace-update';
 import invariant from 'tiny-invariant';
 
-import { primaryTextColor, primaryColor, darkModeTransition, dangerColor } from './colors';
+import { primaryTextColor, primaryColor, primaryInkColor, darkModeTransition, dangerColor } from './colors';
 import SegmentCutpointButton from './components/SegmentCutpointButton';
 import SetCutpointButton from './components/SetCutpointButton';
 import ExportButton from './components/ExportButton';
@@ -332,7 +332,7 @@ function BottomBar({
 
   const playStyle = useMemo<CSSProperties>(() => ({
     paddingLeft: playing ? 0 : '.1em',
-    color: 'white',
+    color: primaryInkColor,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

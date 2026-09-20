@@ -1,11 +1,40 @@
+.wrapper {
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  margin-right: .6em;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05em;
+  letter-spacing: -.03em;
+}
+
+.brand img {
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--accent-surface);
+}
+
+@media (max-width: 900px) {
+  .brand span {
+    display: none;
+  }
+}
+
 .wrapper button, .wrapper select {
-  background-color: var(--gray-1);
+  background-color: var(--surface);
 }
 
 .wrapper button {
-  padding: .3em .3em;
+  padding: .45em .6em;
 }
 
 .wrapper select {
-  padding: .3em 1.4em .3em .3em;
+  padding: .45em 1.4em .45em .6em;
 }

@@ -228,9 +228,9 @@ const Segment = memo(({
       position: 'relative',
       transform: CSS.Transform.toString(sortable.transform),
       transition: transitions.length > 0 ? transitions.join(', ') : undefined,
-      background: 'var(--gray-1)',
-      border: `1px solid ${isActive ? 'var(--gray-10)' : 'transparent'}`,
-      borderRadius: 5,
+      background: isActive ? 'var(--surface-raised)' : 'var(--gray-1)',
+      border: `1px solid ${isActive ? 'var(--cyan-8)' : 'var(--border)'}`,
+      borderRadius: 10,
       opacity: !selected && !invertCutSegments ? 0.5 : undefined,
     };
   }, [invertCutSegments, isActive, selected, sortable.isDragging, sortable.transform, sortable.transition]);

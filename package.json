@@ -1,6 +1,6 @@
 {
   "name": "lossless-cut",
-  "productName": "LosslessCut",
+  "productName": "broccocut",
   "description": "The swiss army knife of lossless video/audio editing",
   "copyright": "Copyright © 2026 ${author}",
   "version": "3.69.0",
@@ -9,8 +9,8 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf dist out common-ts-dist main-ts-dist build-resources icon-build",
-    "start": "electron-vite preview",
-    "dev": "electron-vite dev -w",
+    "start": "yarn generate-icon && electron-vite preview",
+    "dev": "yarn generate-icon && electron-vite dev -w",
     "download-ffmpeg-darwin-x64": "mkdirp ffmpeg/darwin-x64 && cd ffmpeg/darwin-x64 && wget https://github.com/mifi/ffmpeg-build-script/releases/download/8.0-1/ffmpeg-macos-X64 -O ffmpeg && wget https://github.com/mifi/ffmpeg-build-script/releases/download/8.0-1/ffprobe-macos-X64 -O ffprobe && chmod +x ffmpeg && chmod +x ffprobe",
     "download-ffmpeg-darwin-arm64": "mkdirp ffmpeg/darwin-arm64 && cd ffmpeg/darwin-arm64 && wget https://github.com/mifi/ffmpeg-build-script/releases/download/8.0-1/ffmpeg-macos-ARM64 -O ffmpeg && wget https://github.com/mifi/ffmpeg-build-script/releases/download/8.0-1/ffprobe-macos-ARM64 -O ffprobe && chmod +x ffmpeg && chmod +x ffprobe",
     "download-ffmpeg-linux-x64": "mkdirp ffmpeg/linux-x64 && cd ffmpeg/linux-x64 && wget https://github.com/mifi/ffmpeg-builds/releases/download/8.0-1/ffmpeg-n8.0-latest-linux64-gpl-shared-8.0.tar.xz -O ffmpeg-ffprobe.xz && tar -xv -f ffmpeg-ffprobe.xz && mv ffmpeg-n8.0-latest-linux64-gpl-shared-8.0 extracted && mkdirp lib && mv extracted/bin/ffmpeg extracted/bin/ffprobe extracted/lib/lib*.so* lib",
@@ -181,18 +181,22 @@
       "enableEmbeddedAsarIntegrityValidation": true,
       "onlyLoadAppFromAsar": true
     },
-    "appId": "no.mifi.losslesscut",
+    "appId": "com.broccocut.app",
     "artifactName": "${productName}-${os}-${arch}.${ext}",
     "extraResources": [
       {
         "from": "locales",
         "to": "locales"
+      },
+      {
+        "from": "icon-build/app-512.png",
+        "to": "app-icon.png"
       }
     ],
     "mac": {
       "hardenedRuntime": true,
       "notarize": true,
-      "appId": "no.mifi.losslesscut-mac",
+      "appId": "com.broccocut.app",
       "category": "public.app-category.productivity",
       "target": [
         {
@@ -214,6 +218,10 @@
         {
           "from": "ffmpeg/darwin-${arch}",
           "to": "."
+        },
+        {
+          "from": "icon-build/app-mac-512.png",
+          "to": "app-icon-mac.png"
         }
       ],
       "icon": "icon-build/app.icns",
@@ -457,7 +465,7 @@
       "publisherDisplayName": "mifi.no"
     },
     "linux": {
-      "executableName": "losslesscut",
+      "executableName": "broccocut",
       "extraResources": [
         {
           "from": "ffmpeg/linux-${arch}/lib",

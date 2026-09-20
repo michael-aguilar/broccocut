@@ -1,7 +1,11 @@
 $swal2-outline-color: var(--gray-5) !default;
 
 // see colors.ts primaryColor
-$swal2-confirm-button-background-color: var(--cyan-9);
+$swal2-confirm-button-background-color: var(--accent-surface);
+$swal2-confirm-button-color: var(--accent-ink);
+$swal2-border-radius: 16px;
+$swal2-confirm-button-border-radius: 10px;
+$swal2-cancel-button-border-radius: 10px;
 
 $myswal-background: var(--gray-1);
 $myswal-foreground: var(--gray-12);

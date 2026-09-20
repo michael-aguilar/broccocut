@@ -1,0 +1,44 @@
+.dropzone {
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+  overflow: auto;
+  gap: 12px;
+}
+
+.mark {
+  width: 64px;
+  height: 64px;
+  padding: 12px;
+  background: var(--accent-surface);
+  border-radius: 24px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.openButton {
+  min-height: 40px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.hints {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--gray-11);
+  font-size: .85em;
+  line-height: 1.6;
+}
+
+@media (max-height: 600px) {
+  .dropzone { gap: 8px; padding: 16px; }
+  .mark { width: 36px; height: 36px; padding: 8px; border-radius: 16px; }
+  .hints { margin-top: 4px; gap: 4px; }
+}
