@@ -49,7 +49,7 @@ import Working from './components/Working';
 import OutputFormatSelect from './components/OutputFormatSelect';
 import * as Dialog from './components/Dialog';
 
-import { loadMifiLink, runStartupCheck } from './mifi';
+import runStartupCheck from './mifi';
 import { darkModeTransition } from './colors';
 import { getSegColor } from './util/colors';
 import type {
@@ -69,7 +69,7 @@ import { exportEdlFile, readEdlFile, loadLlcProject, askForEdlImport } from './e
 import { formatYouTube, getFrameCountRaw, formatTsvHuman } from './edlFormats';
 import {
   getOutPath, getOutDir,
-  isStoreBuild, dragPreventer,
+  dragPreventer,
   havePermissionToReadFile, resolvePathIfNeeded, getPathReadAccessError, findExistingHtml5FriendlyFile,
   isOutOfSpaceError, readFileSize, readFileSizes, checkFileSizes, setDocumentTitle, readVideoTs, readDirRecursively, getImportProjectType,
   calcShouldShowWaveform, calcShouldShowKeyframes, mediaSourceQualities, isExecaError, getStdioString,
@@ -126,7 +126,7 @@ import { appName } from '../../main/common.js';
 const { ipcRenderer, webUtils } = window.require('electron');
 const { lstat } = window.require('node:fs/promises');
 const { parse: parsePath, join: pathJoin, basename, dirname } = window.require('node:path');
-const { hasDisabledNetworking, pathToFileURL, lossyMode, isLinux } = window.require('@electron/remote').require('./index.js');
+const { pathToFileURL, lossyMode, isLinux } = window.require('@electron/remote').require('./index.js');
 
 
 const hevcPlaybackSupportedPromise = doesPlayerSupportHevcPlayback();
@@ -174,7 +174,6 @@ function App() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [tunerVisible, setTunerVisible] = useState<TunerType>();
   const [keyboardShortcutsVisible, setKeyboardShortcutsVisible] = useState(false);
-  const [mifiLink, setMifiLink] = useState<unknown>();
   const [alwaysConcatMultipleFiles, setAlwaysConcatMultipleFiles] = useState(false);
   const [editingSegmentTagsSegmentIndex, setEditingSegmentTagsSegmentIndex] = useState<number>();
   const [editingSegmentTags, setEditingSegmentTags] = useState<SegmentTags>();
@@ -2482,10 +2481,6 @@ function App() {
   }, [setWaveformMode]);
 
   useEffect(() => {
-    if (!isStoreBuild && !hasDisabledNetworking()) loadMifiLink().then(setMifiLink);
-  }, []);
-
-  useEffect(() => {
     (async () => {
       setFfmpegInfo(await runStartupCheck({ customFfPath, onError: ({ title, message }) => setGenericError({ title, err: message }) }));
     })();
@@ -2564,7 +2559,7 @@ function App() {
 
                   {/* Middle part (also shown in fullscreen): */}
                   <div style={{ position: 'relative', flexGrow: 1, overflow: 'hidden' }} ref={videoContainerRef}>
-                    {!isFileOpened && <NoFileLoaded mifiLink={mifiLink} currentCutSeg={currentCutSeg} onClick={openFilesDialog} darkMode={darkMode} keyBindingByAction={keyBindingByAction} />}
+                    {!isFileOpened && <NoFileLoaded currentCutSeg={currentCutSeg} onClick={openFilesDialog} keyBindingByAction={keyBindingByAction} />}
 
                     <div className="no-user-select" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, visibility: !isFileOpened || !hasVideo || bigWaveformEnabled ? 'hidden' : undefined }} onWheel={onTimelineWheel}>
                       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}

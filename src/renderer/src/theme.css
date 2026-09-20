@@ -1,0 +1,134 @@
+@font-face {
+  font-family: Outfit;
+  src: url('./assets/fonts/Outfit-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Quicksand;
+  src: url('./assets/fonts/Quicksand-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+/* Broccowav's palette, extended to the Radix scales used by the editor.
+   Keep semantic media colors (segments, warnings, errors) independent. */
+:root, .light, .light-theme {
+  --font-body: Outfit, 'Noto Sans', sans-serif;
+  --font-heading: Quicksand, 'Noto Sans', sans-serif;
+  --surface: #faf9f4;
+  --surface-raised: #e3f6e9;
+  --border: #cbc9bf;
+  --accent: #2d9b5f;
+  --accent-surface: #ccefd8;
+  --accent-hover: #b8e8c9;
+  --accent-pressed: #a7e3c2;
+  --accent-ink: #155b38;
+  --focus-ring: #23804b;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+
+  --gray-1: #f1f0e9;
+  --gray-2: #faf9f4;
+  --gray-3: #eaece4;
+  --gray-4: #e3e7dd;
+  --gray-5: #dce1d6;
+  --gray-6: #d3d9ce;
+  --gray-7: #cbc9bf;
+  --gray-8: #a9b3a7;
+  --gray-9: #7b897e;
+  --gray-10: #68786d;
+  --gray-11: #4c564f;
+  --gray-12: #0f1411;
+
+  --cyan-1: #f4fbf6;
+  --cyan-2: #edf8f0;
+  --cyan-3: #e3f6e9;
+  --cyan-4: #ccefd8;
+  --cyan-5: #b8e8c9;
+  --cyan-6: #a7e3c2;
+  --cyan-7: #86cba2;
+  --cyan-8: #5ab47e;
+  --cyan-9: #23804b;
+  --cyan-10: #1c6e40;
+  --cyan-11: #155b38;
+  --cyan-12: #103c26;
+}
+
+.dark, .dark-theme {
+  --surface: #191d19;
+  --surface-raised: #202720;
+  --border: #303a33;
+  --accent-surface: #a7e3c2;
+  --accent-hover: #86d9aa;
+  --accent-pressed: #78ca9d;
+  --focus-ring: #a7e3c2;
+
+  --gray-1: #0f1411;
+  --gray-2: #151a16;
+  --gray-3: #202720;
+  --gray-4: #252d27;
+  --gray-5: #2a342d;
+  --gray-6: #303a33;
+  --gray-7: #3a463d;
+  --gray-8: #4b5a4f;
+  --gray-9: #627368;
+  --gray-10: #7d8e82;
+  --gray-11: #a5aea8;
+  --gray-12: #faf9f4;
+
+  --cyan-1: #101c14;
+  --cyan-2: #15251b;
+  --cyan-3: #1a3324;
+  --cyan-4: #20452e;
+  --cyan-5: #285338;
+  --cyan-6: #306343;
+  --cyan-7: #3a7952;
+  --cyan-8: #4c9669;
+  --cyan-9: #23804b;
+  --cyan-10: #2d9b5f;
+  --cyan-11: #a7e3c2;
+  --cyan-12: #d8f3e3;
+}
+
+.radix-themes {
+  --default-font-family: var(--font-body);
+  --heading-font-family: var(--font-heading);
+  --color-background: var(--gray-1);
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+}
+
+button, input, select, textarea {
+  accent-color: var(--accent);
+}
+
+button:focus-visible, [role='button']:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--accent-ink);
+  background: var(--accent-surface);
+}
+
+.consistent-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--gray-8);
+  border-radius: 8px;
+}
+
+/* Keep export discoverable through color without a persistent bounce. */
+.export-animation {
+  animation: none;
+}

@@ -1,16 +1,17 @@
 .button {
   appearance: none;
-  font: inherit;
+  font-family: var(--font-heading);
+  font-weight: 600;
   line-height: 1.2;
   font-size: .8em;
-  background-color: var(--gray-3);
+  background-color: var(--surface);
   color: var(--gray-12);
-  border-radius: .3em;
-  padding: 0 .5em;
-  outline: .05em solid var(--gray-8);
-  border: .05em solid var(--gray-7);
+  border-radius: var(--radius-control);
+  padding: .35em .7em;
+  border: 1px solid var(--border);
   cursor: pointer;
   outline-offset: 0;
+  transition: background-color 110ms ease, border-color 110ms ease;
 }
 
 .button:disabled {
@@ -18,10 +19,16 @@
   cursor: not-allowed;
 }
 
-.button:focus {
-  outline: .1em solid var(--gray-12);
+.button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
-.button:hover {
-  filter: brightness(1.2);
+.button:hover:not(:disabled) {
+  background-color: var(--surface-raised);
+  border-color: var(--gray-8);
+}
+
+.button:active:not(:disabled) {
+  background-color: var(--gray-5);
 }

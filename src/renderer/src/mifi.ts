@@ -1,24 +1,11 @@
-import ky from 'ky';
 import i18n from 'i18next';
 
 import { runFfmpegStartupCheck, getFfmpegPath } from './ffmpeg';
-import isDev from './isDev';
 import { openSendReportDialog } from './reporting';
 import { isMasBuild } from './util';
 
 
-export async function loadMifiLink() {
-  try {
-    // In old versions: https://mifi.no/losslesscut/config.json
-    return await ky('https://losslesscut.mifi.no/config.json').json();
-    // return await ky('http://localhost:8080/losslesscut/config-dev.json').json();
-  } catch (err) {
-    if (isDev) console.error(err);
-    return undefined;
-  }
-}
-
-export async function runStartupCheck({ customFfPath, onError }: { customFfPath: string | undefined, onError: (error: { title: string, message: string }) => void }) {
+export default async function runStartupCheck({ customFfPath, onError }: { customFfPath: string | undefined, onError: (error: { title: string, message: string }) => void }) {
   try {
     return await runFfmpegStartupCheck();
   } catch (err) {

@@ -13,6 +13,7 @@ import useUserSettings from './hooks/useUserSettings';
 import useActionTitle from './hooks/useActionTitle';
 import styles from './TopMenu.module.css';
 import OutDirSelector from './components/OutDirSelector';
+import brandIcon from './assets/broccocolon3.png';
 
 
 const { stat } = window.require('node:fs/promises');
@@ -89,8 +90,12 @@ function TopMenu({
   return (
     <div
       className={`no-user-select ${styles['wrapper']}`}
-      style={{ background: controlsBackground, transition: darkModeTransition, display: 'flex', alignItems: 'center', padding: '.3em .3em', gap: '.3em', justifyContent: 'space-between', flexWrap: 'wrap' }}
+      style={{ background: controlsBackground, transition: darkModeTransition, display: 'flex', alignItems: 'center', padding: '.6em .8em', gap: '.4em', justifyContent: 'space-between', flexWrap: 'wrap' }}
     >
+      <div className={styles['brand']}>
+        <img src={brandIcon} alt="" />
+        <span>broccocut</span>
+      </div>
       {filePath && (
         <>
           <Button onClick={withBlur(() => setStreamsSelectorShown(true))}>

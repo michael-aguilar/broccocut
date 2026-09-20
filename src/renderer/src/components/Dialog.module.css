@@ -34,11 +34,11 @@
 	max-width: 90vw;
 	max-height: 85vh;
 
-	border: .1em solid var(--black-a2);
-  background: var(--white-a11);
+	border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--gray-12);
   backdrop-filter: blur(2em);
-  border-radius: .5em;
+  border-radius: var(--radius-panel);
   padding: 1.7em;
   box-shadow: 0 0 1em .3em var(--black-a1);
 
@@ -52,8 +52,8 @@
 }
 
 :global(.dark-theme) .DialogContent {
-  border: .1em solid var(--white-a3);
-  background: var(--black-a4);
+  border: 1px solid var(--border);
+  background: var(--surface);
   box-shadow: 0 0 1em .3em var(--black-a2);
 }
 
@@ -64,7 +64,8 @@
 .DialogTitle {
 	margin-top: 0;
 	margin-bottom: .5em;
-	font-weight: 500;
+	font-family: var(--font-heading);
+	font-weight: 600;
 	font-size: 1.3em;
 	padding-bottom: .3em;
   border-bottom: .1em solid var(--black-a3);

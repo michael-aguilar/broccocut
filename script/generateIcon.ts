@@ -2,19 +2,20 @@ import sharp from 'sharp';
 import { writeFile } from 'node:fs/promises';
 
 
-const renderPng = (from: string, width: number, height: number) => sharp(from)
+const renderPng = (from: string, width: number, height: number, padding = 0) => sharp(from)
   .png()
-  .resize(width, height, {
+  .resize(width - padding * 2, height - padding * 2, {
     fit: sharp.fit.contain,
     background: { r: 0, g: 0, b: 0, alpha: 0 },
   })
+  .extend({ top: padding, bottom: padding, left: padding, right: padding, background: { r: 0, g: 0, b: 0, alpha: 0 } })
   .toBuffer();
 
 const svg2png = async (from: string, to: string, width: number, height: number) => (
   writeFile(to, await renderPng(from, width, height))
 );
 
-const renderSquarePngs = (from: string, sizes: number[]) => Promise.all(sizes.map(async (size) => ({ size, data: await renderPng(from, size, size) })));
+const renderSquarePngs = (from: string, sizes: number[], paddingRatio = 0) => Promise.all(sizes.map(async (size) => ({ size, data: await renderPng(from, size, size, Math.round(size * paddingRatio)) })));
 
 // https://en.wikipedia.org/wiki/ICO_(file_format)
 // PNG-compressed entries require Windows Vista or newer
@@ -75,8 +76,8 @@ function makeIcns(pngs: { size: number, data: Buffer }[]) {
   return Buffer.concat([fileHeader, ...chunks]);
 }
 
-const srcIcon = 'src/renderer/src/icon.svg';
-const srcMacIcon = 'src/renderer/src/icon-mac.svg';
+// Full Broccowav app artwork, including its mint rounded-square background.
+const srcIcon = 'src/renderer/src/assets/app-icon.png';
 
 // Linux:
 await svg2png(srcIcon, 'icon-build/app-512.png', 512, 512);
@@ -89,7 +90,10 @@ await svg2png(srcIcon, 'build-resources/appx/Wide310x150Logo.png', 620, 300);
 
 // MacOS:
 // https://github.com/mifi/lossless-cut/issues/1820
-await writeFile('icon-build/app.icns', makeIcns(await renderSquarePngs(srcMacIcon, [512, 1024])));
+// Legacy ICNS icons need their own outer padding: an 824px tile on a 1024px canvas.
+const macPaddingRatio = 100 / 1024;
+await writeFile('icon-build/app-mac-512.png', await renderPng(srcIcon, 512, 512, 512 * macPaddingRatio));
+await writeFile('icon-build/app.icns', makeIcns(await renderSquarePngs(srcIcon, [32, 64, 128, 256, 512, 1024], macPaddingRatio)));
 
 // Windows ICO:
 // https://github.com/mifi/lossless-cut/issues/778

@@ -11,7 +11,7 @@ import { parseYouTube } from '../edlFormats';
 import { appPath, isMasBuild, isStoreBuild, isWindows, isWindowsStoreBuild, testFailFsOperation, trashFile, unlinkWithRetry } from '../util';
 import type { ParseTimecode } from '../types';
 import type { FindKeyframeMode } from '../ffmpeg';
-import { dangerColor, primaryColor, warningColor } from '../colors';
+import { dangerColor, primaryTextColor, warningColor } from '../colors';
 import getSwal from '../swal';
 import isDev from '../isDev';
 import mainApi from '../mainApi';
@@ -488,7 +488,7 @@ export const ListItem = ({ icon, iconColor, children, style }: { icon: ReactNode
 );
 
 export const Notices = ({ notices }: { notices: string[] }) => notices.map((msg) => (
-  <ListItem key={msg} icon={<FaInfoCircle />} iconColor={primaryColor}>{msg}</ListItem>
+  <ListItem key={msg} icon={<FaInfoCircle />} iconColor={primaryTextColor}>{msg}</ListItem>
 ));
 export const Warnings = ({ warnings }: { warnings: string[] }) => warnings.map((msg) => (
   <ListItem key={msg} icon={<FaExclamationTriangle />} iconColor={warningColor}>{msg}</ListItem>

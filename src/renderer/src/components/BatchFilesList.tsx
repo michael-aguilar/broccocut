@@ -10,7 +10,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 import BatchFile from './BatchFile';
-import { controlsBackground, darkModeTransition, primaryColor } from '../colors';
+import { controlsBackground, darkModeTransition, primaryColor, primaryInkColor } from '../colors';
 import type { BatchFile as BatchFileType } from '../types';
 import useUserSettings from '../hooks/useUserSettings';
 
@@ -94,7 +94,7 @@ function BatchFilesList({ selectedBatchFiles, filePath, width, batchFiles, setBa
         <div style={{ flexGrow: 1 }} />
         <FaHatWizard role="button" title={`${t('Convert to supported format')}...`} style={iconStyle} onClick={onBatchConvertToSupportedFormatClick} />
         <SortIcon role="button" title={t('Sort items')} style={iconStyle} onClick={onSortClick} />
-        <AiOutlineMergeCells className={simpleMode ? 'export-animation' : undefined} role="button" title={`${t('Merge/concatenate files')}...`} style={{ ...iconStyle, color: 'white', background: primaryColor, borderRadius: '.5em' }} onClick={onMergeFilesClick} />
+        <AiOutlineMergeCells className={simpleMode ? 'export-animation' : undefined} role="button" title={`${t('Merge/concatenate files')}...`} style={{ ...iconStyle, color: primaryInkColor, background: primaryColor, borderRadius: '.5em' }} onClick={onMergeFilesClick} />
         <FaTimes role="button" title={t('Close batch')} style={{ ...iconStyle, fontSize: '1.1em', color: 'var(--gray-11)' }} onClick={closeBatch} />
       </div>
 

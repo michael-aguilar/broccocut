@@ -19,14 +19,15 @@
 
 .box {
   margin: 15px 15px 50px 15px;
-  border-radius: 10px;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--border);
   padding: 10px 20px;
   min-height: 500px;
   position: relative;
   max-width: 100%;
-  background: var(--white-a11);
+  background: var(--surface);
 }
 
 :global(.dark-theme) .box {
-  background: var(--black-a11);
+  background: var(--surface);
 }
