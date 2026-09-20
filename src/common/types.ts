@@ -54,6 +54,7 @@ export interface Config {
   askBeforeClose: boolean,
   enableImportChapters: EnableImportChapters,
   enableAskForFileOpenAction: boolean,
+  autoPlayOnLoad: boolean,
   playbackVolume: number,
   autoSaveProjectFile: boolean,
   wheelSensitivity: number,

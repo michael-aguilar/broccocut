@@ -320,7 +320,8 @@ async function startPlayback({ path, slaveVideo, masterVideo, videoStreamIndex, 
   processChunk();
 }
 
-function MediaSourcePlayer({ rotate, filePath, videoStream, audioStreams, masterVideoRef, mediaSourceQuality, ffmpegHwaccel, leftToBothAudioStreamIndex, nativeVideoPreview }: {
+function MediaSourcePlayer({ rotate, filePath, videoStream, audioStreams, masterVideoRef, mediaSourceQuality, ffmpegHwaccel, leftToBothAudioStreamIndex, nativeVideoPreview, onReady }: {
+  onReady: () => void,
   leftToBothAudioStreamIndex: number | undefined,
   nativeVideoPreview: boolean,
   rotate: number | undefined,
@@ -335,6 +336,8 @@ function MediaSourcePlayer({ rotate, filePath, videoStream, audioStreams, master
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
   const [showCanvas, setShowCanvas] = useState(false);
+  const onReadyRef = useRef(onReady);
+  useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
 
   const onVideoError = useCallback<ReactEventHandler<HTMLVideoElement>>((error) => {
     console.error('video error', error);
@@ -406,6 +409,7 @@ function MediaSourcePlayer({ rotate, filePath, videoStream, audioStreams, master
             if (controller.signal.aborted) return;
             setLoading(false);
             setShowCanvas(false);
+            onReadyRef.current();
           },
           onResetNeeded: restart,
           onWaiting: () => {

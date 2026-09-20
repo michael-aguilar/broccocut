@@ -75,7 +75,7 @@ function Settings({
 }) {
   const { t } = useTranslation();
 
-  const { customOutDir, keyframeCut, toggleKeyframeCut, timecodeFormat, setTimecodeFormat, invertCutSegments, setInvertCutSegments, askBeforeClose, setAskBeforeClose, enableImportChapters, setEnableImportChapters, enableAskForFileOpenAction, setEnableAskForFileOpenAction, autoSaveProjectFile, setAutoSaveProjectFile, invertTimelineScroll, setInvertTimelineScroll, language, setLanguage, hideNotifications, setHideNotifications, hideOsNotifications, setHideOsNotifications, autoLoadTimecode, setAutoLoadTimecode, enableAutoHtml5ify, setEnableAutoHtml5ify, customFfPath, setCustomFfPath, storeProjectInWorkingDir, mouseWheelZoomModifierKey, setMouseWheelZoomModifierKey, mouseWheelFrameSeekModifierKey, setMouseWheelFrameSeekModifierKey, mouseWheelKeyframeSeekModifierKey, setMouseWheelKeyframeSeekModifierKey, segmentMouseModifierKey, setSegmentMouseModifierKey, captureFrameMethod, setCaptureFrameMethod, captureFrameQuality, setCaptureFrameQuality, captureFrameFileNameFormat, setCaptureFrameFileNameFormat, enableNativeHevc, setEnableNativeHevc, enableUpdateCheck, setEnableUpdateCheck, allowMultipleInstances, setAllowMultipleInstances, preferStrongColors, setPreferStrongColors, treatInputFileModifiedTimeAsStart, setTreatInputFileModifiedTimeAsStart, treatOutputFileModifiedTimeAsStart, setTreatOutputFileModifiedTimeAsStart, exportConfirmEnabled, toggleExportConfirmEnabled, storeWindowBounds, setStoreWindowBounds, reducedMotion, setReducedMotion, ffmpegHwaccel, setFfmpegHwaccel } = useUserSettings();
+  const { customOutDir, keyframeCut, toggleKeyframeCut, timecodeFormat, setTimecodeFormat, invertCutSegments, setInvertCutSegments, askBeforeClose, setAskBeforeClose, enableImportChapters, setEnableImportChapters, enableAskForFileOpenAction, setEnableAskForFileOpenAction, autoPlayOnLoad, setAutoPlayOnLoad, autoSaveProjectFile, setAutoSaveProjectFile, invertTimelineScroll, setInvertTimelineScroll, language, setLanguage, hideNotifications, setHideNotifications, hideOsNotifications, setHideOsNotifications, autoLoadTimecode, setAutoLoadTimecode, enableAutoHtml5ify, setEnableAutoHtml5ify, customFfPath, setCustomFfPath, storeProjectInWorkingDir, mouseWheelZoomModifierKey, setMouseWheelZoomModifierKey, mouseWheelFrameSeekModifierKey, setMouseWheelFrameSeekModifierKey, mouseWheelKeyframeSeekModifierKey, setMouseWheelKeyframeSeekModifierKey, segmentMouseModifierKey, setSegmentMouseModifierKey, captureFrameMethod, setCaptureFrameMethod, captureFrameQuality, setCaptureFrameQuality, captureFrameFileNameFormat, setCaptureFrameFileNameFormat, enableNativeHevc, setEnableNativeHevc, enableUpdateCheck, setEnableUpdateCheck, allowMultipleInstances, setAllowMultipleInstances, preferStrongColors, setPreferStrongColors, treatInputFileModifiedTimeAsStart, setTreatInputFileModifiedTimeAsStart, treatOutputFileModifiedTimeAsStart, setTreatOutputFileModifiedTimeAsStart, exportConfirmEnabled, toggleExportConfirmEnabled, storeWindowBounds, setStoreWindowBounds, reducedMotion, setReducedMotion, ffmpegHwaccel, setFfmpegHwaccel } = useUserSettings();
 
   const onLangChange = useCallback<ChangeEventHandler<HTMLSelectElement>>((e) => {
     const { value } = e.target;
@@ -433,6 +433,13 @@ function Settings({
 
         <Header title={t('User interface')} />
 
+        <Row>
+          <KeyCell>{t('Automatically play newly opened videos')}</KeyCell>
+          <td>
+            <Switch checked={autoPlayOnLoad} onCheckedChange={setAutoPlayOnLoad} />
+          </td>
+        </Row>
+
         {showAdvancedSettings && (
           <Row>
             <KeyCell>{t('Remember window size and position')}</KeyCell>
@@ -524,7 +531,7 @@ function Settings({
 
         {showAdvancedSettings && (
           <Row>
-            <KeyCell>{t('Ask about what to do when opening a new file when another file is already already open?')}</KeyCell>
+            <KeyCell>{t('Ask what to do when opening a single media file')}</KeyCell>
             <td>
               <Switch checked={enableAskForFileOpenAction} onCheckedChange={setEnableAskForFileOpenAction} />
             </td>

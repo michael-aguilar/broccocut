@@ -4,6 +4,8 @@ This fork carries the playback changes originally tested in a local LosslessCut 
 
 ## Playback behavior
 
+- **Settings → User interface → Automatically play newly opened videos** starts each newly opened or replacement video once its video and audio preview are ready. The preference is saved and defaults to off. Pausing, scrubbing, and changing playback tracks do not trigger autoplay again.
+- Opening a single media file replaces the current file without an action prompt by default. **File → Open with options...** shows the original replace/import-tracks/merge choices for one opening. Project/subtitle imports and opening multiple files still offer their applicable choices. **Tools → Merge/concatenate files** also keeps access to the chooser. The advanced setting **Ask what to do when opening a single media file** restores the prompt for routine opens; older profiles can retain their saved setting.
 - Every embedded audio track is selected when a file opens. Tracks can still be switched individually in the playback menu.
 - With multiple audio tracks, the last track defaults to **Left → both ears** when it has two channels. This is a ShadowPlay microphone convention, not automatic microphone detection. Turn it off or select another track in the playback menu if a recording differs.
 - The microphone channel mapping also works when that track is played alone. Other tracks retain their normal channel handling, including upstream's channel-layout repair.
@@ -52,6 +54,28 @@ node .yarn/releases/yarn-4.18.0.cjs build
 ```
 
 Windows checkouts must use LF line endings for source files to satisfy the upstream lint rules. Configure `git config core.autocrlf input` before subsequent checkouts. Do not commit mass line-ending changes.
+
+## Updating the installed Windows app
+
+Close Broccocut, then run this from the repository folder:
+
+```powershell
+node .yarn/releases/yarn-4.18.0.cjs update-local
+```
+
+This builds an unsigned Windows ZIP without publishing a release, validates and stages it, and replaces `%LOCALAPPDATA%\Programs\Broccocut`. The old app is retained under `%LOCALAPPDATA%\Programs\Broccocut-backups`. If replacement fails after moving the old app, the script restores it. It refuses to replace a running app instead of interrupting open work.
+
+The Start menu shortcut keeps the same target. Settings stay in the existing roaming profile. A separately installed MP4 folder launcher continues working because the executable path does not change. Neither the launcher nor Windows default-app choices are changed by this command.
+
+To install a ZIP that has already been built:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File script/update-local.ps1 -PackagePath dist/broccocut-win-x64.zip
+```
+
+Add `-VerifyOnly` to validate that ZIP without installing it. These commands update from a local build; they do not download GitHub releases or pull source changes. Upstream update checks remain off by default.
+
+To restore an older build, close Broccocut, move the current `Programs\Broccocut` folder aside, and move the desired backup into that exact location. Application backups do not roll back profile/settings changes.
 
 ## Updating from upstream
 

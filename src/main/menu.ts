@@ -36,6 +36,12 @@ export default ({ app, mainWindow, newVersion, isStoreBuild, openExternal }: {
           },
         },
         {
+          label: esc(t('Open with options...')),
+          async click() {
+            mainWindow.webContents.send('openFilesWithOptionsDialog');
+          },
+        },
+        {
           label: esc(t('Open folder')),
           async click() {
             mainWindow.webContents.send('openDirDialog');

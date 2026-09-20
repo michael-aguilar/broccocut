@@ -87,6 +87,8 @@ export default function useUserSettingsRoot() {
   useEffect(() => safeSetConfig({ enableImportChapters }), [enableImportChapters]);
   const [enableAskForFileOpenAction, setEnableAskForFileOpenAction] = useState(safeGetConfigInitial('enableAskForFileOpenAction'));
   useEffect(() => safeSetConfig({ enableAskForFileOpenAction }), [enableAskForFileOpenAction]);
+  const [autoPlayOnLoad, setAutoPlayOnLoad] = useState(safeGetConfigInitial('autoPlayOnLoad'));
+  useEffect(() => safeSetConfig({ autoPlayOnLoad }), [autoPlayOnLoad]);
   const [playbackVolume, setPlaybackVolume] = useState(safeGetConfigInitial('playbackVolume'));
   useEffect(() => safeSetConfig({ playbackVolume }), [playbackVolume]);
   const [autoSaveProjectFile, setAutoSaveProjectFile] = useState(safeGetConfigInitial('autoSaveProjectFile'));
@@ -262,6 +264,7 @@ export default function useUserSettingsRoot() {
     askBeforeClose,
     enableImportChapters,
     enableAskForFileOpenAction,
+    autoPlayOnLoad,
     playbackVolume,
     autoSaveProjectFile,
     wheelSensitivity,
@@ -343,6 +346,7 @@ export default function useUserSettingsRoot() {
     setAskBeforeClose,
     setEnableImportChapters,
     setEnableAskForFileOpenAction,
+    setAutoPlayOnLoad,
     setPlaybackVolume,
     setAutoSaveProjectFile,
     setWheelSensitivity,

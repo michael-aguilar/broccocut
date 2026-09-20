@@ -112,7 +112,8 @@ const defaults: Config = {
   exportConfirmEnabled: true,
   askBeforeClose: false,
   enableImportChapters: 'ask',
-  enableAskForFileOpenAction: true,
+  enableAskForFileOpenAction: false,
+  autoPlayOnLoad: false,
   playbackVolume: 0.3, // so that we don't shock new users with loud volume
   autoSaveProjectFile: true,
   wheelSensitivity: 0.2,

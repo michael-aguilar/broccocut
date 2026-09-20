@@ -190,7 +190,7 @@ function App() {
   const [selectedBatchFiles, setSelectedBatchFiles] = useState<string[]>([]);
 
   const allUserSettings = useUserSettingsRoot();
-  const { captureFormat, keyframeCut, preserveMetadata, preserveMetadataOnMerge, preserveMovData, preserveChapters, movFastStart, avoidNegativeTs, autoMerge, timecodeFormat, invertCutSegments, autoExportExtraStreams, askBeforeClose, enableImportChapters, enableAskForFileOpenAction, playbackVolume, autoSaveProjectFile, wheelSensitivity, waveformHeight, invertTimelineScroll, language, ffmpegExperimental, hideNotifications, hideOsNotifications, autoLoadTimecode, autoDeleteMergedSegments, exportConfirmEnabled, segmentsToChapters, simpleMode, cutFileTemplate, cutMergedFileTemplate, mergedFileTemplate, keyboardSeekAccFactor, keyboardNormalSeekSpeed, keyboardSeekSpeed2, keyboardSeekSpeed3, treatInputFileModifiedTimeAsStart, treatOutputFileModifiedTimeAsStart, outFormatLocked, safeOutputFileName, enableAutoHtml5ify, segmentsToChaptersOnly, keyBindings, enableSmartCut, customFfPath, storeProjectInWorkingDir, enableOverwriteOutput, mouseWheelZoomModifierKey, mouseWheelFrameSeekModifierKey, mouseWheelKeyframeSeekModifierKey, captureFrameMethod, captureFrameQuality, captureFrameFileNameFormat, enableNativeHevc, cleanupChoices, darkMode, preferStrongColors, outputFileNameMinZeroPadding, cutFromAdjustmentFrames, cutToAdjustmentFrames, waveformMode: waveformModePreference, thumbnailsEnabled, keyframesEnabled, reducedMotion, ffmpegHwaccel } = allUserSettings.settings;
+  const { captureFormat, keyframeCut, preserveMetadata, preserveMetadataOnMerge, preserveMovData, preserveChapters, movFastStart, avoidNegativeTs, autoMerge, timecodeFormat, invertCutSegments, autoExportExtraStreams, askBeforeClose, enableImportChapters, enableAskForFileOpenAction, autoPlayOnLoad, playbackVolume, autoSaveProjectFile, wheelSensitivity, waveformHeight, invertTimelineScroll, language, ffmpegExperimental, hideNotifications, hideOsNotifications, autoLoadTimecode, autoDeleteMergedSegments, exportConfirmEnabled, segmentsToChapters, simpleMode, cutFileTemplate, cutMergedFileTemplate, mergedFileTemplate, keyboardSeekAccFactor, keyboardNormalSeekSpeed, keyboardSeekSpeed2, keyboardSeekSpeed3, treatInputFileModifiedTimeAsStart, treatOutputFileModifiedTimeAsStart, outFormatLocked, safeOutputFileName, enableAutoHtml5ify, segmentsToChaptersOnly, keyBindings, enableSmartCut, customFfPath, storeProjectInWorkingDir, enableOverwriteOutput, mouseWheelZoomModifierKey, mouseWheelFrameSeekModifierKey, mouseWheelKeyframeSeekModifierKey, captureFrameMethod, captureFrameQuality, captureFrameFileNameFormat, enableNativeHevc, cleanupChoices, darkMode, preferStrongColors, outputFileNameMinZeroPadding, cutFromAdjustmentFrames, cutToAdjustmentFrames, waveformMode: waveformModePreference, thumbnailsEnabled, keyframesEnabled, reducedMotion, ffmpegHwaccel } = allUserSettings.settings;
   const { setCaptureFormat, setCustomOutDir, setKeyframeCut, setPlaybackVolume, setExportConfirmEnabled, setSimpleMode, setOutFormatLocked, setSafeOutputFileName, setKeyBindings, resetKeyBindings, setStoreProjectInWorkingDir, setCleanupChoices, toggleDarkMode, setWaveformMode, setThumbnailsEnabled, setKeyframesEnabled, prefersReducedMotion, customOutDir } = allUserSettings;
 
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(!simpleMode);
@@ -623,6 +623,30 @@ function App() {
 
   const compatPlayerEnabled = (compatPlayerRequired || compatPlayerWanted) && (activeVideoStream != null || activeAudioStreams.length > 0);
 
+  const pendingAutoPlayRef = useRef<{ filePath: string, previewReady: boolean }>(undefined);
+  const cancelAutoPlay = useCallback(() => { pendingAutoPlayRef.current = undefined; }, []);
+  useEffect(() => {
+    if (!autoPlayOnLoad) cancelAutoPlay();
+  }, [autoPlayOnLoad, cancelAutoPlay]);
+
+  const tryAutoPlay = useCallback(() => {
+    const pending = pendingAutoPlayRef.current;
+    const video = videoRef.current;
+    if (!pending || pending.filePath !== filePath || !autoPlayOnLoad || !video || video.readyState < 3 || video.seeking) return;
+    if (compatPlayerEnabled && !pending.previewReady) return;
+
+    // Consume the request before playing; buffering and later seeks must not resume a paused video.
+    cancelAutoPlay();
+    play();
+  }, [filePath, autoPlayOnLoad, videoRef, compatPlayerEnabled, cancelAutoPlay, play]);
+
+  const onPreviewReady = useCallback(() => {
+    const pending = pendingAutoPlayRef.current;
+    if (!pending || pending.filePath !== filePath) return;
+    pending.previewReady = true;
+    tryAutoPlay();
+  }, [filePath, tryAutoPlay]);
+
   useEffect(() => {
     // Reset the user preference when we go from not having compat player to having it
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -663,8 +687,12 @@ function App() {
     };
   }, [cacheBuster, effectiveFilePath, videoRef]);
 
+  // Stream detection can switch to native playback after the initial canplay event.
+  useEffect(() => { tryAutoPlay(); }, [tryAutoPlay]);
+
   const resetState = useCallback(() => {
     console.log('State reset');
+    cancelAutoPlay();
     const video = videoRef.current;
     setCommandedTime(0);
     video!.currentTime = 0;
@@ -703,7 +731,7 @@ function App() {
     setExportConfirmOpen(false);
     setOutputPlaybackRateState(1);
     setCurrentFileExportCount(0);
-  }, [videoRef, setCommandedTime, setPlaybackRate, setPreviewFilePath, setUsingDummyVideo, setPlaying, playingRef, setPlaybackMode, cutSegmentsHistory, setDetectedFileFormat, setCopyStreamIdsByFile, setThumbnails, setSubtitlesByStreamId, setOutputPlaybackRateState]);
+  }, [cancelAutoPlay, videoRef, setCommandedTime, setPlaybackRate, setPreviewFilePath, setUsingDummyVideo, setPlaying, playingRef, setPlaybackMode, cutSegmentsHistory, setDetectedFileFormat, setCopyStreamIdsByFile, setThumbnails, setSubtitlesByStreamId, setOutputPlaybackRateState]);
 
 
   const showNotNativelySupportedMessage = useCallback(() => {
@@ -1567,13 +1595,14 @@ function App() {
       // This needs to be last, because it triggers <video> to load the video
       // If not, onVideoError might be triggered before setWorking() has been cleared.
       // https://github.com/mifi/lossless-cut/issues/515
+      pendingAutoPlayRef.current = autoPlayOnLoad ? { filePath: fp, previewReady: false } : undefined;
       setFilePath(fp);
     } catch (err) {
       if (err instanceof DirectoryAccessDeclinedError) return;
       resetState();
       throw err;
     }
-  }, [storeProjectInWorkingDir, setWorking, loadEdlFile, getEdlFilePath, enableImportChapters, ensureAccessToSourceDir, loadCutSegments, autoLoadTimecode, enableNativeHevc, ensureWritableOutDir, customOutDir, resetState, clearSegColorCounter, setCopyStreamIdsForPath, setDetectedFileFormat, outFormatLocked, setUsingDummyVideo, setPreviewFilePath, html5ifyAndLoadWithPreferences, setFileFormat, showNotification, showPreviewFileLoadedMessage, showNotNativelySupportedMessage]);
+  }, [autoPlayOnLoad, storeProjectInWorkingDir, setWorking, loadEdlFile, getEdlFilePath, enableImportChapters, ensureAccessToSourceDir, loadCutSegments, autoLoadTimecode, enableNativeHevc, ensureWritableOutDir, customOutDir, resetState, clearSegColorCounter, setCopyStreamIdsForPath, setDetectedFileFormat, outFormatLocked, setUsingDummyVideo, setPreviewFilePath, html5ifyAndLoadWithPreferences, setFileFormat, showNotification, showPreviewFileLoadedMessage, showNotNativelySupportedMessage]);
 
   const toggleLastCommands = useCallback(() => setLastCommandsVisible((val) => !val), []);
   const toggleSettings = useCallback(() => setSettingsVisible((val) => !val), []);
@@ -1841,7 +1870,7 @@ function App() {
     });
   }, []);
 
-  const userOpenFiles = useCallback(async (newFilePathsIn?: string[]) => {
+  const userOpenFiles = useCallback(async (newFilePathsIn?: string[], forceAskForAction = false) => {
     await withErrorHandling(async () => {
       let newFilePaths = newFilePathsIn;
       if (!newFilePaths || newFilePaths.length === 0) return;
@@ -1918,12 +1947,14 @@ function App() {
         if (batchFiles.length > 0 || newFilePaths.length > 1) inputOptions.addToBatch = i18n.t('Add the file to the batch list');
 
         const inputOptionsKeys = Object.keys(inputOptions) as (keyof typeof inputOptions)[];
+        // Replacing one media file is the common path. Keep import and batch choices explicit.
+        const shouldAskForAction = forceAskForAction || enableAskForFileOpenAction
+          || newFilePaths.length > 1 || isLlcProject || filePathLowerCase.endsWith('.srt');
 
         let openFileResponse: OpenFileResponse | undefined;
-        if (inputOptionsKeys.length === 1) [openFileResponse] = inputOptionsKeys;
-        if (!enableAskForFileOpenAction && inputOptionsKeys.length > 1) openFileResponse = 'addToBatch';
-        if (enableAskForFileOpenAction && inputOptionsKeys.length > 1) openFileResponse = await askForFileOpenAction(Object.entries(inputOptions) as [OpenFileResponse, string][]);
+        if (shouldAskForAction && inputOptionsKeys.length > 1) openFileResponse = await askForFileOpenAction(Object.entries(inputOptions) as [OpenFileResponse, string][]);
         else if (newFilePaths.length === 1) openFileResponse = 'open';
+        else [openFileResponse] = inputOptionsKeys;
 
         if (openFileResponse === 'open') {
           await userOpenSingleFile({ path: firstNewFilePath, isLlcProject });
@@ -1960,12 +1991,15 @@ function App() {
     }, i18n.t('Failed to open file'));
   }, [withErrorHandling, alwaysConcatMultipleFiles, workingRef, batchLoadPaths, setWorking, isFileOpened, batchFiles.length, enableAskForFileOpenAction, checkFileOpened, loadEdlFile, userOpenSingleFile, addStreamSourceFile, filePath]);
 
-  const openFilesDialog = useCallback(async () => {
+  const showOpenFilesDialog = useCallback(async (forceAskForAction: boolean) => {
     // On Windows and Linux an open dialog can not be both a file selector and a directory selector, so if you set `properties` to `['openFile', 'openDirectory']` on these platforms, a directory selector will be shown. #1995
     const { canceled, filePaths } = await showOpenDialog({ properties: ['openFile', 'multiSelections'], defaultPath: lastOpenedPathRef.current!, title: t('Open file') });
     if (canceled) return;
-    userOpenFiles(filePaths);
+    await userOpenFiles(filePaths, forceAskForAction);
   }, [t, userOpenFiles]);
+
+  const openFilesDialog = useCallback(() => showOpenFilesDialog(false), [showOpenFilesDialog]);
+  const openFilesWithOptionsDialog = useCallback(() => showOpenFilesDialog(true), [showOpenFilesDialog]);
 
   const openDirDialog = useCallback(async () => {
     const { canceled, filePaths } = await showOpenDialog({ properties: ['openDirectory', 'multiSelections'], defaultPath: lastOpenedPathRef.current!, title: t('Open folder') });
@@ -1975,12 +2009,12 @@ function App() {
 
   const concatBatch = useCallback(() => {
     if (batchFiles.length < 2) {
-      openFilesDialog();
+      openFilesWithOptionsDialog();
       return;
     }
 
     setConcatDialogOpen(true);
-  }, [batchFiles.length, openFilesDialog]);
+  }, [batchFiles.length, openFilesWithOptionsDialog]);
 
   const togglePlaySelectedSegments = useCallback(() => togglePlay({ resetPlaybackRate: false, requestPlaybackMode: 'play-selected-segments' }), [togglePlay]);
   const toggleLoopSelectedSegments = useCallback(() => togglePlay({ resetPlaybackRate: false, requestPlaybackMode: 'loop-selected-segments' }), [togglePlay]);
@@ -2386,6 +2420,7 @@ function App() {
       ...Object.entries({
         // todo separate actions per type and move them into mainActions? https://github.com/mifi/lossless-cut/issues/254#issuecomment-932649424
         importEdlFile,
+        openFilesWithOptionsDialog,
         exportEdlFile: tryExportEdlFile,
         promptDownloadMediaUrl: promptDownloadMediaUrlWrapper,
       }).map(([key, fn]) => [
@@ -2437,7 +2472,7 @@ function App() {
       ipcActions.forEach(([key, action]) => ipcRenderer.off(key, action));
       ipcRenderer.off('apiAction', tryApiAction);
     };
-  }, [checkFileOpened, customOutDir, detectedFps, filePath, getFrameCount, getKeyboardAction, goToTimecodeDirect, handleError, importEdlFile, loadCutSegments, mainActions, promptDownloadMediaUrlWrapper, selectedSegments, toggleKeyboardShortcuts, tryExportEdlFile, userOpenFiles]);
+  }, [checkFileOpened, customOutDir, detectedFps, filePath, getFrameCount, getKeyboardAction, goToTimecodeDirect, handleError, importEdlFile, loadCutSegments, mainActions, openFilesWithOptionsDialog, promptDownloadMediaUrlWrapper, selectedSegments, toggleKeyboardShortcuts, tryExportEdlFile, userOpenFiles]);
 
   const handleBatchFilesDrop = useCallback<DragEventHandler<HTMLDivElement>>(async (ev) => {
     ev.preventDefault();
@@ -2583,7 +2618,9 @@ function App() {
                         muted={playbackVolume === 0 || compatPlayerEnabled}
                         ref={videoRef}
                         style={videoStyle}
-                        onPlay={onStartPlaying}
+                        onPlay={() => { cancelAutoPlay(); onStartPlaying(); }}
+                        onCanPlay={tryAutoPlay}
+                        onSeeking={cancelAutoPlay}
                         onPause={onStopPlaying}
                         onAbort={onVideoAbort}
                         onDurationChange={onDurationChange}
@@ -2597,7 +2634,7 @@ function App() {
                         {renderSubtitles()}
                       </video>
 
-                      {filePath != null && compatPlayerEnabled && <MediaSourcePlayer rotate={effectiveRotation} filePath={filePath} videoStream={activeVideoStream} audioStreams={activeAudioStreams} masterVideoRef={videoRef} mediaSourceQuality={mediaSourceQuality} ffmpegHwaccel={ffmpegHwaccel} leftToBothAudioStreamIndex={leftToBothAudioStreamIndex} nativeVideoPreview={nativeVideoPreview} />}
+                      {filePath != null && compatPlayerEnabled && <MediaSourcePlayer rotate={effectiveRotation} filePath={filePath} videoStream={activeVideoStream} audioStreams={activeAudioStreams} masterVideoRef={videoRef} mediaSourceQuality={mediaSourceQuality} ffmpegHwaccel={ffmpegHwaccel} leftToBothAudioStreamIndex={leftToBothAudioStreamIndex} nativeVideoPreview={nativeVideoPreview} onReady={onPreviewReady} />}
                     </div>
 
                     {bigWaveformEnabled && <BigWaveform waveforms={waveforms} relevantTime={relevantTime} playing={playing} fileDurationNonZero={fileDurationNonZero} zoom={zoomUnrounded} seekRel={seekRel} darkMode={darkMode} />}
