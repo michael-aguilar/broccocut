@@ -1,6 +1,6 @@
 # Broccocut workflow customizations
 
-This fork carries the playback changes originally tested in a local LosslessCut 3.69.0 installation. The changes now live in the TypeScript/React source and are included by the normal build. The app uses the Broccocut name and [Broccowav theme](theming.md), with the upstream license and attribution retained.
+This fork carries the playback changes originally tested in a local LosslessCut 3.69.0 installation. The changes now live in the TypeScript/React source and are included by the normal build. The app uses the Broccocut name and the [Brocco styleguide theme](theming.md), with the upstream license and attribution retained.
 
 ## Playback behavior
 

@@ -1,10 +1,11 @@
 # Broccocut theme
 
-The renderer uses the Broccowav visual theme: Outfit body text, Quicksand headings and controls, forest and cream surfaces, mint actions, and the shared broccoli mark.
+The renderer matches the Brocco styleguide from the brocco monorepo: Quicksand for the interface, forest and cream surfaces, mint primary actions, and the shared broccoli mark. See `AGENTS.md` for how the shared tokens are refreshed.
 
-- `src/renderer/src/theme.css` owns the light/dark palette, font faces, radii, and focus styling. It maps the editor's existing Radix gray and cyan scales onto the theme so legacy controls inherit the palette.
+- `src/renderer/src/brocco-tokens.css` is a copy of the monorepo's design tokens. Don't edit it here.
+- `src/renderer/src/theme.css` points Cut's variables (`--surface`, `--accent-*`, `--radius-control`, and the Radix gray and cyan scales) at the tokens and owns the font faces and focus styling. `App.tsx` sets `data-brocco-theme` on `<html>` so the tokens follow Cut's dark mode. Control corners are 4px tighter than the styleguide's because Cut's controls are smaller.
 - `src/renderer/src/colors.ts` exposes shared semantic colors. Primary action backgrounds must be paired with `primaryInkColor` for readable contrast.
-- Component CSS modules own layout and interaction states. Keep editor controls compact; preserve monospace timecodes and distinct segment colors. The first segment uses the brand green.
+- Component CSS modules own layout and interaction states; buttons, selects, switches, checkboxes, dialogs, and menus follow the styleguide's controls. Keep editor controls compact; preserve monospace timecodes and distinct segment colors. The first segment uses the brand green.
 - Fonts and their OFL licenses are bundled in `src/renderer/src/assets/fonts`. The fonts and broccoli mark were copied from the local Broccowav project.
 
 The existing light/dark setting is retained. The opening screen uses a keyboard-accessible Open file button and no longer loads the upstream promotional iframe. Upstream attribution remains in place.
