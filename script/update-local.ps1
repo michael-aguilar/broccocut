@@ -41,6 +41,33 @@ function Assert-AppClosed {
     if ($running.Count) { throw 'Close Broccocut first, then run this command again. Your open work has not been interrupted.' }
 }
 
+# The .llc fileAssociations in package.json are only registered by installer
+# targets; a ZIP install has none, so register the project type for this user.
+# Another app's claim on .llc and choices made in Default apps are kept.
+function Register-ProjectFiles([string]$ExePath) {
+    $progId = 'Broccocut.Project'
+    # CreateSubKey opens existing keys without clearing them, unlike New-Item -Force.
+    function Set-ClassValue([string]$SubKey, [string]$Name, $Value, $Kind = [Microsoft.Win32.RegistryValueKind]::String) {
+        $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey("Software\Classes\$SubKey")
+        try { $key.SetValue($Name, $Value, $Kind) } finally { $key.Dispose() }
+    }
+    Set-ClassValue $progId '' 'Broccocut project'
+    Set-ClassValue "$progId\DefaultIcon" '' "`"$ExePath`",0"
+    Set-ClassValue "$progId\shell\open\command" '' "`"$ExePath`" `"%1`""
+    Set-ClassValue '.llc\OpenWithProgids' $progId ([byte[]]@()) ([Microsoft.Win32.RegistryValueKind]::None)
+    $extension = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Software\Classes\.llc')
+    try {
+        $current = $extension.GetValue('')
+        if (-not $current -or $current -eq $progId) {
+            $extension.SetValue('', $progId)
+            Write-Output '.llc project files open in Broccocut.'
+        } else { Write-Output ".llc files still open with $current; Broccocut is listed under Open with." }
+    } finally { $extension.Dispose() }
+    # Let Explorer pick up the change without signing out.
+    Add-Type -Namespace Broccocut -Name Shell -MemberDefinition '[DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, uint flags, IntPtr item1, IntPtr item2);'
+    [Broccocut.Shell]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)
+}
+
 if (-not $PackagePath) {
     if ($VerifyOnly) { throw 'Use -PackagePath with -VerifyOnly.' }
     Assert-AppClosed
@@ -120,6 +147,8 @@ try {
     $shortcut.IconLocation = $shortcut.TargetPath + ',0'
     $shortcut.Description = 'Broccocut video editor'
     $shortcut.Save()
+    try { Register-ProjectFiles (Join-Path $installPath 'broccocut.exe') }
+    catch { Write-Warning "Broccocut is updated, but .llc files could not be associated: $_" }
     Write-Output "Updated Broccocut at $installPath"
     if ($backupPath) { Write-Output "Previous version retained at $backupPath" }
     Write-Output 'Your profile, MP4 folder launcher, and default-app selection are unchanged.'

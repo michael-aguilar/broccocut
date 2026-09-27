@@ -67,6 +67,8 @@ This builds an unsigned Windows ZIP without publishing a release, validates and 
 
 The Start menu shortcut keeps the same target. Settings stay in the existing roaming profile. A separately installed MP4 folder launcher continues working because the executable path does not change. Neither the launcher nor Windows default-app choices are changed by this command.
 
+It also registers `.llc` project files for the current user, so double-clicking one opens it in Broccocut. The `fileAssociations` in `package.json` only take effect through installer targets, and this ZIP install has none. If another app already handles `.llc`, it stays the default and Broccocut is added under **Open with**.
+
 To install a ZIP that has already been built:
 
 ```powershell
