@@ -1,15 +1,16 @@
 .select {
   appearance: none;
-  font-family: var(--font-body);
+  font-family: var(--brocco-font-ui);
+  font-weight: 500;
   line-height: 1.2;
   font-size: .8em;
-  background-color: var(--surface);
-  color: var(--gray-12);
+  background-color: var(--brocco-surface);
+  color: var(--brocco-text);
   border-radius: var(--radius-control);
   padding: 0 1.4em 0 .3em;
-  border: 1px solid var(--border);
+  border: 1px solid var(--brocco-border-control);
 
-  background-image: url("data:image/svg+xml;utf8,<svg fill='rgba(0,0,0,0.6)' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg fill='none' stroke='rgba(15,20,17,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='m8 10 4 4 4-4'/></svg>");
   background-repeat: no-repeat;
   background-position-x: 100%;
   background-position-y: 0;
@@ -17,9 +18,14 @@
 }
 
 .select:hover {
-  background-color: var(--surface-raised);
+  background-color: var(--brocco-surface-hover);
+}
+
+.select:focus-visible {
+  outline: var(--brocco-focus-width) solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 :global(.dark-theme) .select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='rgba(255,255,255,0.6)' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg fill='none' stroke='rgba(250,249,244,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='m8 10 4 4 4-4'/></svg>");
 }

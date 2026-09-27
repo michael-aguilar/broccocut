@@ -6,9 +6,7 @@
 	background-color: var(--surface);
 	border-radius: var(--radius-control);
 	padding: .2em;
-	box-shadow:
-		0px 1em 3.8em -1em rgba(22, 23, 24, 0.35),
-		0px 1em 2em -1.5em rgba(22, 23, 24, 0.2);
+	box-shadow: var(--brocco-shadow-float);
 	animation-duration: 400ms;
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 	will-change: transform, opacity;
@@ -31,13 +29,13 @@
 	display: flex;
 	align-items: center;
 	padding: .5em .8em;
-  border-radius: var(--radius-control);
+  border-radius: calc(var(--radius-control) - 4px);
 	position: relative;
 	user-select: none;
 	outline: none;
 }
 .DropdownMenuItem[data-highlighted]:not([data-disabled]) {
-  background-color: var(--surface-raised);
+  background-color: var(--brocco-surface-hover);
   cursor: pointer;
 }
 

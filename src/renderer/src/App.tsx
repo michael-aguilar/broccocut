@@ -2562,6 +2562,11 @@ function App() {
     ...(prefersReducedMotion ? ['no-animations'] : []),
   ].join(' '), [darkMode, prefersReducedMotion]);
 
+  // Broccocut: the shared Brocco tokens (theme.css) follow data-brocco-theme on <html>.
+  useEffect(() => {
+    document.documentElement.dataset['broccoTheme'] = darkMode ? 'dark' : 'light';
+  }, [darkMode]);
+
   const rootStyle = useMemo<CSSProperties>(() => ({ ...baseColorStyle, display: 'flex', flexDirection: 'column', height: '100vh', transition: darkModeTransition }), [baseColorStyle]);
 
   return (

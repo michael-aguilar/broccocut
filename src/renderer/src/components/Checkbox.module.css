@@ -2,31 +2,41 @@
   all: unset
 }
 
+/* Matches the Brocco checkbox: a rounded box that fills when checked. */
 .CheckboxRoot {
   flex-shrink: 0;
-  background-color: var(--gray-1);
-  width: 1em;
-  height: 1em;
-  border: .1em solid var(--gray-8);
-  border-radius: .2em;
+  box-sizing: border-box;
+  background-color: var(--brocco-surface);
+  width: 1.1em;
+  height: 1.1em;
+  border: .12em solid var(--brocco-border-control);
+  border-radius: .28em;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px var(--gray-1);
+  cursor: pointer;
+  transition: background-color 110ms ease, border-color 110ms ease;
 }
-.CheckboxRoot:hover {
-  background-color: var(--gray-3);
+.CheckboxRoot:hover:not([data-disabled], [data-state='checked']) {
+  background-color: var(--brocco-surface-hover);
 }
-.CheckboxRoot:focus {
-  box-shadow: 0 0 0 .1em var(--gray-10);
+.CheckboxRoot:focus-visible {
+  outline: var(--brocco-focus-width) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.CheckboxRoot[data-state='checked'] {
+  border-color: var(--brocco-switch-on);
+  background-color: var(--brocco-switch-on);
 }
 
 .CheckboxIndicator {
-  color: var(--gray-12);
+  display: flex;
+  color: var(--brocco-switch-thumb);
 }
 
 .CheckboxRoot[data-disabled]{
   opacity: .5;
+  cursor: not-allowed;
 }
 
 .Label {

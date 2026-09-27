@@ -1,3 +1,5 @@
+@import './brocco-tokens.css';
+
 @font-face {
   font-family: Outfit;
   src: url('./assets/fonts/Outfit-Variable.ttf') format('truetype');
@@ -14,23 +16,32 @@
   font-display: swap;
 }
 
-/* Broccowav's palette, extended to the Radix scales used by the editor.
+/* Cut's names point at the shared Brocco tokens (brocco-tokens.css, copied
+   from the brocco monorepo). App.tsx sets data-brocco-theme on <html>, so these
+   follow Cut's dark mode. The Radix scales below keep the editor's steps and
+   match the tokens' page, surface, border, and text colors.
    Keep semantic media colors (segments, warnings, errors) independent. */
-:root, .light, .light-theme {
-  --font-body: Outfit, 'Noto Sans', sans-serif;
-  --font-heading: Quicksand, 'Noto Sans', sans-serif;
-  --surface: #faf9f4;
-  --surface-raised: #e3f6e9;
-  --border: #cbc9bf;
-  --accent: #2d9b5f;
-  --accent-surface: #ccefd8;
-  --accent-hover: #b8e8c9;
-  --accent-pressed: #a7e3c2;
-  --accent-ink: #155b38;
-  --focus-ring: #23804b;
-  --radius-control: 10px;
-  --radius-panel: 16px;
+/* Listed with the dark selectors too: Radix Themes sets its own --accent-surface
+   and friends on .dark, which would otherwise win in dark mode. */
+:root, .light, .light-theme, .dark, .dark-theme {
+  --font-body: var(--brocco-font-ui);
+  --font-heading: var(--brocco-font-heading);
+  --surface: var(--brocco-surface);
+  --surface-raised: var(--brocco-surface-raised);
+  --border: var(--brocco-border);
+  --accent: var(--brocco-accent);
+  --accent-surface: var(--brocco-accent-surface);
+  --accent-hover: var(--brocco-accent-hover);
+  --accent-pressed: var(--brocco-accent-pressed);
+  --accent-ink: var(--brocco-accent-ink);
+  --focus-ring: var(--brocco-focus-ring);
+  /* Cut's controls are about 26px tall, smaller than Brocco's compact 34px,
+     so the radius shrinks with them to keep the same rounded-rectangle look. */
+  --radius-control: calc(var(--brocco-radius-control) - 4px);
+  --radius-panel: var(--brocco-radius-panel);
+}
 
+:root, .light, .light-theme {
   --gray-1: #f1f0e9;
   --gray-2: #faf9f4;
   --gray-3: #eaece4;
@@ -59,14 +70,6 @@
 }
 
 .dark, .dark-theme {
-  --surface: #191d19;
-  --surface-raised: #202720;
-  --border: #303a33;
-  --accent-surface: #a7e3c2;
-  --accent-hover: #86d9aa;
-  --accent-pressed: #78ca9d;
-  --focus-ring: #a7e3c2;
-
   --gray-1: #0f1411;
   --gray-2: #151a16;
   --gray-3: #202720;
@@ -106,6 +109,7 @@ body {
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
+  letter-spacing: var(--brocco-heading-tracking);
 }
 
 button, input, select, textarea {
@@ -114,8 +118,8 @@ button, input, select, textarea {
 
 button:focus-visible, [role='button']:focus-visible,
 input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: var(--brocco-focus-width) solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 ::selection {

@@ -4,6 +4,7 @@
   color: var(--accent-ink);
   font-family: var(--font-heading);
   font-weight: 700;
+  border: 1px solid var(--accent-ink);
   border-radius: var(--radius-control);
   padding-bottom: .1em;
   padding-left: .4em;
@@ -12,8 +13,8 @@
 }
 
 .exportButton:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: var(--brocco-focus-width) solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .exportButton:hover {

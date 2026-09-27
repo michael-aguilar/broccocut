@@ -1,0 +1,140 @@
+/*
+ * Brocco design tokens, copied from the brocco monorepo's
+ * packages/tokens/src/tokens.css at 8918505.
+ * Don't edit this copy: change the tokens there and run
+ * `pnpm tokens:copy <this file>` from the monorepo.
+ */
+/* Complete theme palettes allow nested light/dark previews. */
+:root,
+[data-brocco-theme] {
+  --brocco-font-body: 'Outfit', system-ui, sans-serif;
+  --brocco-font-ui: 'Quicksand', system-ui, sans-serif;
+  --brocco-font-heading: var(--brocco-font-ui);
+  --brocco-radius-control: 14px;
+  --brocco-radius-panel: 14px;
+  --brocco-radius-pill: 999px;
+  --brocco-focus-width: 3px;
+  --brocco-focus-offset: 4px;
+  --brocco-heading-tracking: -0.03em;
+  --brocco-heading-leading: 1.05;
+  --brocco-space-1: 4px;
+  --brocco-space-2: 8px;
+  --brocco-space-3: 12px;
+  --brocco-space-4: 16px;
+  --brocco-space-6: 24px;
+  --brocco-space-8: 32px;
+  --brocco-space-12: 48px;
+  --brocco-text-small: 0.875rem;
+  --brocco-text-body: 1rem;
+  --brocco-text-title: 1.5rem;
+}
+:root,
+[data-brocco-theme='light'] {
+  color-scheme: light;
+  --brocco-page: #f1f0e9;
+  --brocco-surface: #faf9f4;
+  --brocco-surface-raised: #e3f6e9;
+  --brocco-surface-hover: #eaece4;
+  --brocco-surface-pressed: #dce1d6;
+  --brocco-text: #0f1411;
+  --brocco-text-muted: #4c564f;
+  --brocco-border: #cbc9bf;
+  --brocco-border-control: #7b897e;
+  --brocco-accent: #2d9b5f;
+  --brocco-accent-surface: #ccefd8;
+  --brocco-accent-hover: #b8e8c9;
+  --brocco-accent-pressed: #a7e3c2;
+  --brocco-accent-ink: #155b38;
+  --brocco-accent-text: #155b38;
+  --brocco-current: #e3f6e9;
+  --brocco-current-ink: #155b38;
+  --brocco-link: #137a40;
+  --brocco-link-hover: #0f6f39;
+  --brocco-focus-ring: #23804b;
+  --brocco-switch-off: #68786d;
+  --brocco-switch-on: #23804b;
+  --brocco-switch-thumb: #faf9f4;
+  --brocco-danger: #a52b32;
+  --brocco-danger-surface: #fce9e7;
+  --brocco-danger-button-surface: #b93c48;
+  --brocco-danger-button-hover: #a8333e;
+  --brocco-danger-button-pressed: #942b36;
+  --brocco-danger-button-ink: #ffffff;
+  --brocco-danger-focus-ring: #b93c48;
+  --brocco-success: #155b38;
+  --brocco-success-surface: #e3f6e9;
+  --brocco-warning: #795300;
+  --brocco-warning-surface: #fff0c2;
+  --brocco-success-bar: #2d9b5f;
+  --brocco-warning-bar: #c98918;
+  --brocco-danger-bar: #c95b50;
+  --brocco-live: #d42037;
+  --brocco-on-live: #ffffff;
+  --brocco-shadow-float: 0 8px 24px rgba(37, 43, 39, 0.1);
+}
+[data-brocco-theme='dark'] {
+  color-scheme: dark;
+  --brocco-page: #0f1411;
+  --brocco-surface: #191d19;
+  --brocco-surface-raised: #202720;
+  --brocco-surface-hover: #252d27;
+  --brocco-surface-pressed: #303a33;
+  --brocco-text: #faf9f4;
+  --brocco-text-muted: #a5aea8;
+  --brocco-border: #303a33;
+  --brocco-border-control: #7d8e82;
+  --brocco-accent: #2d9b5f;
+  --brocco-accent-surface: #a7e3c2;
+  --brocco-accent-hover: #86d9aa;
+  --brocco-accent-pressed: #78ca9d;
+  --brocco-accent-ink: #103c26;
+  --brocco-accent-text: #a7e3c2;
+  --brocco-current: #1a3324;
+  --brocco-current-ink: #a7e3c2;
+  --brocco-link: #30a266;
+  --brocco-link-hover: #5cc28a;
+  --brocco-focus-ring: #a7e3c2;
+  --brocco-switch-off: #7d8e82;
+  --brocco-switch-on: #a7e3c2;
+  --brocco-switch-thumb: #0f1411;
+  --brocco-danger: #ffb4ad;
+  --brocco-danger-surface: #391f20;
+  --brocco-danger-button-surface: #c24852;
+  --brocco-danger-button-hover: #ba3e4a;
+  --brocco-danger-button-pressed: #aa3642;
+  --brocco-danger-button-ink: #ffffff;
+  --brocco-danger-focus-ring: #e3727c;
+  --brocco-success: #a7e3c2;
+  --brocco-success-surface: #1a3324;
+  --brocco-warning: #eed184;
+  --brocco-warning-surface: #332b16;
+  --brocco-success-bar: #a7e3c2;
+  --brocco-warning-bar: #eed184;
+  --brocco-danger-bar: #ffb4ad;
+  --brocco-live: #d42037;
+  --brocco-on-live: #ffffff;
+  --brocco-shadow-float: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+:root,
+[data-brocco-density='comfortable'] {
+  --brocco-control-height: 44px;
+  --brocco-control-padding-x: 16px;
+  --brocco-control-font-size: 1rem;
+  --brocco-field-gap: 8px;
+  --brocco-panel-padding: 24px;
+  --brocco-stack-gap: 24px;
+}
+[data-brocco-density='compact'] {
+  --brocco-control-height: 34px;
+  --brocco-control-padding-x: 12px;
+  --brocco-control-font-size: 0.875rem;
+  --brocco-field-gap: 6px;
+  --brocco-panel-padding: 16px;
+  --brocco-stack-gap: 16px;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-brocco-density] {
+    --brocco-control-height: 44px;
+  }
+}

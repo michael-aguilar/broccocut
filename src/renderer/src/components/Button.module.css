@@ -1,14 +1,14 @@
 .button {
   appearance: none;
-  font-family: var(--font-heading);
+  font-family: var(--brocco-font-ui);
   font-weight: 600;
   line-height: 1.2;
   font-size: .8em;
-  background-color: var(--surface);
-  color: var(--gray-12);
+  background-color: var(--brocco-surface);
+  color: var(--brocco-text);
   border-radius: var(--radius-control);
   padding: .35em .7em;
-  border: 1px solid var(--border);
+  border: 1px solid var(--brocco-border-control);
   cursor: pointer;
   outline-offset: 0;
   transition: background-color 110ms ease, border-color 110ms ease;
@@ -20,15 +20,14 @@
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: var(--brocco-focus-width) solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 .button:hover:not(:disabled) {
-  background-color: var(--surface-raised);
-  border-color: var(--gray-8);
+  background-color: var(--brocco-surface-hover);
 }
 
 .button:active:not(:disabled) {
-  background-color: var(--gray-5);
+  background-color: var(--brocco-surface-pressed);
 }

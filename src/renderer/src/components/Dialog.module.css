@@ -40,7 +40,7 @@
   backdrop-filter: blur(2em);
   border-radius: var(--radius-panel);
   padding: 1.7em;
-  box-shadow: 0 0 1em .3em var(--black-a1);
+  box-shadow: var(--brocco-shadow-float);
 
 	&[data-state="open"] {
 		animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -51,11 +51,6 @@
 	}
 }
 
-:global(.dark-theme) .DialogContent {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  box-shadow: 0 0 1em .3em var(--black-a2);
-}
 
 .DialogContent:focus {
 	outline: none;
