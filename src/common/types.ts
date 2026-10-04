@@ -9,6 +9,13 @@ export interface KeyBinding {
 
 export type FfmpegHwAccel = 'none' | 'auto' | 'vdpau' | 'dxva2' | 'd3d11va' | 'vaapi' | 'qsv' | 'videotoolbox';
 
+// Broccocut: settings for "Export for Discord"
+export interface DiscordExportSettings {
+  quality: 'high' | 'balanced' | 'small',
+  resolution: '480p' | '720p' | '1080p' | 'original',
+  sizeLimitMb: number,
+}
+
 /**
  * The parts of an audio stream's ffprobe data needed to decide whether its channel layout
  * has to be fixed up before ffmpeg can resample or downmix it. See `getFixChannelLayoutFilter`.
@@ -117,6 +124,7 @@ export interface Config {
   keyframesEnabled: boolean,
   reducedMotion: 'always' | 'never' | 'user',
   ffmpegHwaccel: FfmpegHwAccel,
+  discordExport: DiscordExportSettings,
 }
 
 export interface ApiActionRequest {

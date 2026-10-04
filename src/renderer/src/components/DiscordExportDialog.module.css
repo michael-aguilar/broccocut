@@ -1,0 +1,76 @@
+.fields {
+  display: grid;
+  gap: var(--brocco-space-2);
+  margin-bottom: var(--brocco-space-4);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--brocco-space-3);
+}
+
+.estimate {
+  display: grid;
+  gap: var(--brocco-space-3);
+  padding: var(--brocco-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+}
+
+.estimateRow {
+  display: grid;
+  gap: var(--brocco-space-1);
+}
+
+.estimateLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--brocco-space-2);
+}
+
+.estimateLabel > :first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.estimateValue {
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.estimateValue[data-over="true"] {
+  color: var(--brocco-danger);
+}
+
+.muted {
+  color: var(--brocco-text-muted);
+  font-size: .9em;
+}
+
+.meter {
+  height: .4em;
+  border-radius: var(--brocco-radius-pill);
+  background: var(--gray-4);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brocco-success-bar);
+  transition: width 200ms ease;
+}
+
+.meter[data-level="close"] .meterFill {
+  background: var(--brocco-warning-bar);
+}
+
+.meter[data-level="over"] .meterFill {
+  background: var(--brocco-danger-bar);
+}

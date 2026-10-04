@@ -39,6 +39,8 @@ import Settings from './components/Settings';
 import Timeline from './Timeline';
 import BottomBar from './BottomBar';
 import ExportConfirm from './components/ExportConfirm';
+import DiscordExportDialog, { DiscordExportResult } from './components/DiscordExportDialog';
+import { getDiscordFileName, runDiscordExport } from './discordExport';
 import ValueTuners from './components/ValueTuners';
 import VolumeControl from './components/VolumeControl';
 import PlaybackStreamSelector from './components/PlaybackStreamSelector';
@@ -91,7 +93,7 @@ import { askExtractFramesAsImages } from './dialogs/extractFrames';
 import type { CleanupChoicesType, OpenFileResponse } from './dialogs';
 import { askForOutDir, askForImportChapters, askForFileOpenAction, showDiskFull, showExportFailedDialog, showConcatFailedDialog, openYouTubeChaptersDialog, showRefuseToOverwrite, showOpenDialog, showMuxNotSupported, promptDownloadMediaUrl, showOutputNotWritable, deleteFiles, mustDisallowVob, toastError } from './dialogs';
 import { openSendReportDialog } from './reporting';
-import { sortSegments, convertSegmentsToChaptersWithGaps, hasAnySegmentOverlap, isDurationValid, getPlaybackAction, getSegmentTags, filterNonMarkers, isInitialSegment } from './segments';
+import { sortSegments, convertSegmentsToChaptersWithGaps, hasAnySegmentOverlap, isDurationValid, getPlaybackAction, getSegmentTags, filterNonMarkers, isInitialSegment, getGuaranteedSegments } from './segments';
 import type { GenerateMergedOutFileNamesParams, GeneratedOutFileNames } from './util/outputNameTemplate';
 import { generateCutFileNames as generateCutFileNamesRaw, generateCutMergedFileNames as generateCutMergedFileNamesRaw, generateMergedFileNames as generateMergedFileNamesRaw, defaultCutFileTemplate, defaultCutMergedFileTemplate, defaultMergedFileTemplate } from './util/outputNameTemplate';
 import { rightBarWidth, leftBarWidth, ffmpegExtractWindow, zoomMax } from './util/constants';
@@ -1304,6 +1306,99 @@ function App() {
       setStreamsSelectorShown(false);
     }
   }, [filePath, exportConfirmEnabled, exportConfirmOpen, onExportConfirm]);
+
+  // Broccocut: re-encoded export for Discord, see discordExport.ts
+  const [discordExportOpen, setDiscordExportOpen] = useState(false);
+
+  const onDiscordExportPress = useCallback(() => {
+    if (!filePath) return;
+    setStreamsSelectorShown(false);
+    setDiscordExportOpen(true);
+  }, [filePath]);
+
+  const discordOutputs = useMemo(() => {
+    // no segments means the whole file, like the normal export
+    if (!isDurationValid(fileDuration)) return [];
+    const ranges = getGuaranteedSegments(segmentsToExport, fileDuration).map(({ start, end }) => ({ start, end }));
+    return willMerge ? [ranges] : ranges.map((range) => [range]);
+  }, [fileDuration, segmentsToExport, willMerge]);
+
+  const discordEncodeParams = useMemo(() => {
+    const videoStream = getRealVideoStreams(mainCopiedStreams)[0];
+    const enabledAudioStreams = getAudioStreams(mainCopiedStreams);
+    if (filePath == null || (videoStream == null && enabledAudioStreams.length === 0)) return undefined;
+    return {
+      filePath,
+      videoStream: videoStream && { index: videoStream.index },
+      audioStreams: enabledAudioStreams.map(({ index }) => ({ index })),
+      leftToBothAudioStreamIndex,
+      rotation: isRotationSet ? effectiveRotation : undefined,
+      ffmpegHwaccel,
+    };
+  }, [effectiveRotation, ffmpegHwaccel, filePath, isRotationSet, leftToBothAudioStreamIndex, mainCopiedStreams]);
+
+  const onDiscordExportConfirm = useCallback(async () => {
+    invariant(filePath != null && outputDir != null);
+    if (discordEncodeParams == null) return;
+
+    if (haveInvalidSegs) {
+      errorToast(i18n.t('Start time must be before end time'));
+      return;
+    }
+
+    setDiscordExportOpen(false);
+
+    if (workingRef.current) return;
+    try {
+      setWorking({ text: i18n.t('Exporting for Discord') });
+
+      const { fileNames } = willMerge ? await generateCutMergedFileNames(cutMergedFileTemplateOrDefault) : await generateCutFileNames(cutFileTemplateOrDefault);
+      const outPaths = fileNames.map((fileName) => getOutPath({ customOutDir, filePath, fileName: getDiscordFileName(fileName) }));
+
+      const { discordExport } = allUserSettings.settings;
+      const { files, skippedPaths } = await runDiscordExport({
+        outputs: discordOutputs,
+        outPaths,
+        outputDir,
+        encodeParams: { ...discordEncodeParams, settings: discordExport },
+        enableOverwriteOutput,
+        appendFfmpegCommandLog,
+        onProgress: setProgress,
+      });
+
+      const [revealPath] = files.length > 0 ? files.map((f) => f.path) : skippedPaths;
+      invariant(revealPath != null);
+      if (!hideAllNotifications) {
+        showOsNotification(i18n.t('Export finished'));
+        openExportFinishedDialog({ filePath: revealPath, children: <DiscordExportResult files={files} skippedPaths={skippedPaths} sizeLimitMb={discordExport.sizeLimitMb} /> });
+      }
+
+      setExportCount((c) => c + 1);
+      setCurrentFileExportCount((c) => c + 1);
+    } catch (err) {
+      if (isAbortedError(err)) return;
+
+      showOsNotification(i18n.t('Failed to export'));
+
+      if (isExecaError(err)) {
+        console.error('stderr:', getStdioString(err.stderr));
+        if (isOutOfSpaceError(err)) {
+          showDiskFull();
+          return;
+        }
+      }
+
+      if (err instanceof UserFacingError) {
+        errorToast(err.message);
+        return;
+      }
+
+      handleExportFailed(err);
+    } finally {
+      setWorking(undefined);
+      setProgress(undefined);
+    }
+  }, [allUserSettings.settings, appendFfmpegCommandLog, customOutDir, cutFileTemplateOrDefault, cutMergedFileTemplateOrDefault, discordEncodeParams, discordOutputs, enableOverwriteOutput, filePath, generateCutFileNames, generateCutMergedFileNames, handleExportFailed, haveInvalidSegs, hideAllNotifications, openExportFinishedDialog, outputDir, setWorking, showOsNotification, willMerge, workingRef]);
 
   const captureSnapshot = useCallback(async () => {
     if (!filePath || workingRef.current) return;
@@ -2784,6 +2879,7 @@ function App() {
                     cleanupFilesDialog={cleanupFilesDialog}
                     captureSnapshot={captureSnapshot}
                     onExportPress={onExportPress}
+                    onDiscordExportPress={onDiscordExportPress}
                     segmentsToExport={segmentsToExport}
                     seekAbs={seekAbs}
                     currentSegIndexSafe={currentSegIndexSafe}
@@ -2832,6 +2928,8 @@ function App() {
                 {/* Dialogs */}
 
                 <ExportConfirm areWeCutting={areWeCutting} segmentsOrInverse={segmentsOrInverse} segmentsToExport={segmentsToExport} willMerge={willMerge} visible={exportConfirmOpen} onClosePress={closeExportConfirm} onExportConfirm={onExportConfirm} renderOutFmt={renderOutFmt} outputDir={outputDir} numStreamsTotal={numStreamsTotal} numStreamsToCopy={numStreamsToCopy} onShowStreamsSelectorClick={handleShowStreamsSelectorClick} outFormat={fileFormat} cutFileTemplate={cutFileTemplateOrDefault} cutMergedFileTemplate={cutMergedFileTemplateOrDefault} generateCutFileNames={generateCutFileNames} generateCutMergedFileNames={generateCutMergedFileNames} currentSegIndexSafe={currentSegIndexSafe} mainCopiedThumbnailStreams={mainCopiedThumbnailStreams} needSmartCut={needSmartCut} isEncoding={isEncoding} encBitrate={encBitrate} setEncBitrate={setEncBitrate} toggleSettings={toggleSettings} outputPlaybackRate={outputPlaybackRate} lossyMode={lossyMode} neighbouringKeyFrames={neighbouringKeyFrames} findNearestKeyFrameTime={findNearestKeyFrameTime} />
+
+                <DiscordExportDialog open={discordExportOpen} onOpenChange={setDiscordExportOpen} outputs={discordOutputs} encodeParams={discordEncodeParams} onExport={onDiscordExportConfirm} />
 
                 <Dialog.Root open={streamsSelectorShown} onOpenChange={setStreamsSelectorShown}>
                   <Dialog.Portal>

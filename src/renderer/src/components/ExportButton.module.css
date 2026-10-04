@@ -20,3 +20,16 @@
 .exportButton:hover {
   filter: brightness(.94);
 }
+
+/* Broccocut: secondary "Export for Discord" button next to Export */
+.discordButton {
+  composes: exportButton;
+  color: var(--brocco-text);
+  background-color: var(--brocco-surface);
+  border-color: var(--brocco-border-control);
+}
+
+.discordButton:hover {
+  filter: none;
+  background-color: var(--brocco-surface-hover);
+}

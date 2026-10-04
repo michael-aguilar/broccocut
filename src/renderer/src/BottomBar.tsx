@@ -13,6 +13,7 @@ import { primaryTextColor, primaryColor, primaryInkColor, darkModeTransition, da
 import SegmentCutpointButton from './components/SegmentCutpointButton';
 import SetCutpointButton from './components/SetCutpointButton';
 import ExportButton from './components/ExportButton';
+import DiscordExportButton from './components/DiscordExportButton';
 import ToggleExportConfirm from './components/ToggleExportConfirm';
 import CaptureFormatButton from './components/CaptureFormatButton';
 import Select from './components/Select';
@@ -261,7 +262,7 @@ const CutTimeInput = memo(({ disabled, darkMode, cutTime, setCutTime, startTimeO
 function BottomBar({
   zoom, setZoom, timelineToggleComfortZoom,
   isRotationSet, rotation, areWeCutting, increaseRotation, cleanupFilesDialog,
-  captureSnapshot, onExportPress, segmentsToExport, hasVideo,
+  captureSnapshot, onExportPress, onDiscordExportPress, segmentsToExport, hasVideo,
   seekAbs, currentSegIndexSafe, cutSegments, currentCutSeg, setCutStart, setCutEnd,
   setCurrentSegIndex,
   jumpTimelineStart, jumpTimelineEnd, jumpCutEnd, jumpCutStart, startTimeOffset, setCutTime,
@@ -283,6 +284,7 @@ function BottomBar({
   cleanupFilesDialog: () => void,
   captureSnapshot: () => void,
   onExportPress: () => void,
+  onDiscordExportPress: () => void,
   segmentsToExport: SegmentToExport[],
   hasVideo: boolean,
   seekAbs: (a: number) => void,
@@ -634,6 +636,10 @@ function BottomBar({
 
         {!exportConfirmEnabled && (<FaExclamationTriangle style={{ color: dangerColor, marginLeft: '.4em' }} title={t('Export options screen is disabled, and you will not see any important notices or warnings.')} />)}
         {(!simpleMode || !exportConfirmEnabled) && <ToggleExportConfirm style={{ marginLeft: exportConfirmEnabled ? '.4em' : undefined }} />}
+
+        {isFileOpened && (
+          <DiscordExportButton onClick={withBlur(onDiscordExportPress)} />
+        )}
 
         {isFileOpened && (
           <ExportButton segmentsToExport={segmentsToExport} areWeCutting={areWeCutting} onClick={withBlur(onExportPress)} />

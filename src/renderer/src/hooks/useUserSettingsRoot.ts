@@ -199,6 +199,8 @@ export default function useUserSettingsRoot() {
   useEffect(() => safeSetConfig({ reducedMotion }), [reducedMotion]);
   const [ffmpegHwaccel, setFfmpegHwaccel] = useState(safeGetConfigInitial('ffmpegHwaccel'));
   useEffect(() => safeSetConfig({ ffmpegHwaccel }), [ffmpegHwaccel]);
+  const [discordExport, setDiscordExport] = useState(safeGetConfigInitial('discordExport'));
+  useEffect(() => safeSetConfig({ discordExport }), [discordExport]);
 
 
   const resetKeyBindings = useCallback(() => {
@@ -319,6 +321,7 @@ export default function useUserSettingsRoot() {
     keyframesEnabled,
     reducedMotion,
     ffmpegHwaccel,
+    discordExport,
   };
 
   return {
@@ -403,6 +406,7 @@ export default function useUserSettingsRoot() {
     prefersReducedMotion,
     setReducedMotion,
     setFfmpegHwaccel,
+    setDiscordExport,
   };
 }
 

@@ -174,6 +174,7 @@ const defaults: Config = {
   keyframesEnabled: true,
   reducedMotion: 'user',
   ffmpegHwaccel: 'none',
+  discordExport: { quality: 'balanced', resolution: '720p', sizeLimitMb: 50 },
 };
 
 const configFileName = 'config.json'; // note: this is also hard-coded inside electron-store
