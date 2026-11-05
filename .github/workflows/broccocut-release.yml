@@ -1,0 +1,129 @@
+# Builds Broccocut for Windows and macOS and publishes a GitHub release.
+# brocco.tools/downloads/broccocut links these files through
+# releases/latest/download/, so keep the file names stable.
+#
+# Start a release from the Actions tab (Release Broccocut → Run workflow), or
+# push a tag that starts with broccocut-v. Upstream's build.yml only runs for
+# v* tags, so it ignores these.
+name: Release Broccocut
+
+on:
+  push:
+    tags:
+      - 'broccocut-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag. Leave empty for broccocut-v<package version>-<run number>.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: broccocut-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'michael-aguilar/broccocut'
+    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-2022
+            file: broccocut-win-x64.zip
+          - os: macos-latest
+            file: broccocut-mac-arm64.dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      # Windows fix. See https://github.com/actions/checkout/issues/226
+      - run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - run: yarn install --immutable --network-timeout 1000000
+
+      - name: Download ffmpeg (Windows)
+        if: runner.os == 'Windows'
+        run: yarn download-ffmpeg-win32-x64
+
+      - name: Download ffmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: yarn download-ffmpeg-darwin-arm64
+
+      - run: yarn build
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: yarn electron-builder --win zip --x64 --publish never
+
+      # Ad-hoc signed and not notarized: Apple silicon calls an unsigned
+      # download "damaged" with no way to open it, while an ad-hoc signed one
+      # gets the usual Open Anyway in Privacy & Security.
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: >-
+          yarn electron-builder --mac dmg --arm64 --publish never
+          -c.mac.identity=-
+          -c.mac.hardenedRuntime=false
+          -c.mac.notarize=false
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.file }}
+          path: dist/${{ matrix.file }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v6
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag="$GITHUB_REF_NAME"
+          elif [ -n "$INPUT_TAG" ]; then
+            tag="$INPUT_TAG"
+          else
+            tag="broccocut-v${version}-${GITHUB_RUN_NUMBER}"
+          fi
+          ls -l release
+          test -f release/broccocut-win-x64.zip
+          test -f release/broccocut-mac-arm64.dmg
+          notes="Broccocut built from ${GITHUB_SHA::7}, based on LosslessCut ${version}.
+
+          - Windows: extract broccocut-win-x64.zip and run broccocut.exe.
+          - macOS (Apple silicon): open broccocut-mac-arm64.dmg and drag the app to Applications. If macOS blocks it, use Open Anyway in System Settings → Privacy & Security.
+
+          ffmpeg is included in both."
+          gh release create "$tag" \
+            release/broccocut-win-x64.zip \
+            release/broccocut-mac-arm64.dmg \
+            --target "$GITHUB_SHA" \
+            --title "Broccocut ${tag#broccocut-v}" \
+            --notes "$notes" \
+            --latest

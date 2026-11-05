@@ -79,6 +79,20 @@ Add `-VerifyOnly` to validate that ZIP without installing it. These commands upd
 
 To restore an older build, close Broccocut, move the current `Programs\Broccocut` folder aside, and move the desired backup into that exact location. Application backups do not roll back profile/settings changes.
 
+## Releasing
+
+[brocco.tools/downloads/broccocut](https://brocco.tools/downloads/broccocut) links the newest published release on this fork:
+
+- `https://github.com/michael-aguilar/broccocut/releases/latest/download/broccocut-win-x64.zip`
+- `https://github.com/michael-aguilar/broccocut/releases/latest/download/broccocut-mac-arm64.dmg`
+
+The **Release Broccocut** workflow (`.github/workflows/broccocut-release.yml`) builds both on GitHub, then publishes them as one release. To release, push the changes to `master`, then either:
+
+- open **Actions → Release Broccocut → Run workflow** on GitHub and leave the tag empty, which names the release `broccocut-v<version>-<run number>`, or
+- push a tag that starts with `broccocut-v`, such as `git tag broccocut-v3.69.0-2 && git push origin broccocut-v3.69.0-2`.
+
+The release is published only once both builds succeed, so the download links never point at a half-finished release. Keep the two file names: the links depend on them. The Windows ZIP is the same package `update-local` installs. The macOS build is for Apple silicon, ad-hoc signed and not notarized, so macOS asks to confirm the first launch. Upstream's `build.yml` only runs for `v*` tags and needs upstream's signing secrets; don't use it for Broccocut.
+
 ## Updating from upstream
 
 `origin` is `https://github.com/michael-aguilar/broccocut.git`; `upstream` is `https://github.com/mifi/lossless-cut.git`. A fresh clone only sets up `origin`, so add `upstream` once if needed:
