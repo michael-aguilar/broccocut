@@ -1,11 +1,11 @@
 name: Build/release
 
+# Upstream LosslessCut's nightly/release build. It needs mifi's signing,
+# App Store and Snapcraft secrets and expects LosslessCut.exe, so it can't
+# pass on the Broccocut fork. The nightly schedule and v* tag triggers are
+# off so it stops failing every day; use "Release Broccocut"
+# (broccocut-release.yml) instead. It can still be run by hand.
 on:
-  push:
-    tags:
-      - 'v*'
-  schedule:
-    - cron: '0 10 * * *'
   workflow_dispatch:
     inputs:
       tmate_enabled:
